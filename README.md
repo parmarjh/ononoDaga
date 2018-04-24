@@ -1,49 +1,49 @@
 # onodaga-e911
 
-This repository is a collection of lambdas to scrape Onondaga county's computer aided dispatch (CAD) or E911 events.
+Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
 
 ## Quickstart
 
 1. Install dependencies.
 
-Must have node and python3.6 installed.
+	Must have node and python3.6 installed.
 
-```
-pip3 install awscli
-pip3 install pipenv
-pipenv install
-npm install -g serverless
-npm install
-```
+	```
+	pip3 install awscli
+	pip3 install pipenv
+	pipenv install
+	npm install -g serverless
+	npm install
+	```
 
 2. Set up AWS Credentials.
 
-```
-aws configure
-```
+	```
+	aws configure
+	```
 
-Run `cat ~/.aws/credentials` to ensure the credentials are set up properly. Make sure you have the `region` set.
+	Run `cat ~/.aws/credentials` to ensure the credentials are set up properly. Make sure you have the `region` set.
 
-The output should look similar to:
+	The output should look similar to:
 
-```
-[default]
-aws_access_key_id = xxx
-aws_secret_access_key = xxx
-region = us-east-1
-```
+	```
+	[default]
+	aws_access_key_id = xxx
+	aws_secret_access_key = xxx
+	region = us-east-1
+	```
 
-For help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+	For help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
 3. Deploy the stack with serverless.
 
-```
-serverless deploy
-```
+	```
+	serverless deploy
+	```
 
-**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to append `--aws-profile PROFILE` to each command. For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
+	**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to append `--aws-profile PROFILE` to each command. For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
 
-You can also set `AWS_PROFILE=xyz` in a `.env` file and `pipenv shell` will load the env vars automatically.
+	You can also set `AWS_PROFILE=xyz` in a `.env` file and `pipenv shell` will load the env vars automatically.
 
 ## Checking Logs
 
