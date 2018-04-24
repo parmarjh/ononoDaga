@@ -68,10 +68,10 @@ serverless remove
 
 ### Export Single Date
 
-This query exports data from "2018-04-24".
+This command exports data from "2018-04-24" into a file named `events.json`.
 
 ```
-aws dynamodb query --table-name onondaga-e911 --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > items.json
+aws dynamodb query --table-name onondaga-e911 --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
 ```
 
 ### Export All Data
@@ -92,8 +92,10 @@ For help, see:
 - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ProvisionedThroughput.html
 - https://aws.amazon.com/dynamodb/faqs/#What_is_a_readwrite_capacity_unit
 
+This command exports the entire database into a file called `events.json`.
+
 ```
-aws dynamodb scan --table-name onondaga-e911 --output json > items.json
+aws dynamodb scan --table-name onondaga-e911 --output json > events.json
 ```
 
 ### Check Read/Write Capacity Units
