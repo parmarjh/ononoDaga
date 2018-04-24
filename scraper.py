@@ -52,7 +52,7 @@ def run(event, context):
         # convert empty string to null because dynamodb doesn't support it yet
         # https://github.com/aws/aws-sdk-java/issues/1189
         row = {headers[j]: x if x != "" else None for j, x in enumerate(raw_data)}
-        timestamp = arrow.get(row['timestamp'], "MM/DD/YY HH:mm", tzinfo="US/Eastern").to('utc')
+        timestamp = arrow.get(row['timestamp'], "MM/DD/YY HH:mm", tzinfo="US/Eastern")
         row['timestamp'] = timestamp.isoformat()
         row['date'] = timestamp.date().isoformat()
         row['hash'] = hashed
