@@ -41,9 +41,9 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	serverless deploy
 	```
 
-	**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to append `--aws-profile PROFILE` to each command. For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
+	**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to create a `.env` file and set `AWS_PROFILE=xyz` where `xyz` is the name of your profile. Run `pipenv shell` to activate virtualenv; this will automatically load the `.env` file too. Now, you can run `serverless deploy` and it will use the proper AWS credentials.
 
-	You can also set `AWS_PROFILE=xyz` in a `.env` file and `pipenv shell` will load the env vars automatically.
+	You can also set `--aws-profile PROFILE` to each serverless command. For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
 
 ## Checking Logs
 
