@@ -122,11 +122,11 @@ aws dynamodb describe-table --table-name onondaga-e911
 Check:
 
 ```
-        "ProvisionedThroughput": {
-            "NumberOfDecreasesToday": 0,
-            "ReadCapacityUnits": 1,
-            "WriteCapacityUnits": 1
-        },
+"ProvisionedThroughput": {
+    "NumberOfDecreasesToday": 0,
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+},
 ```
 
 
