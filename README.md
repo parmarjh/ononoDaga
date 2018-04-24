@@ -43,17 +43,22 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	For help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
-3. Deploy the stack with serverless.
+3. Create `.env` file.
 
 	```
+	touch .env
+	```
+
+	If you are using the `default` aws role, just leave the file blank. Otherwise, set: `AWS_PROFILE=xyz` where `xyz` is the name of your profile.
+
+4. Deploy the stack with serverless.
+
+	`pipenv shell` will activate a virtualenv and load your environment variables. `serverless deploy` will create the stack on AWS.
+
+	```
+	pipenv shell
 	serverless deploy
 	```
-
-	**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to create a `.env` file and set `AWS_PROFILE=xyz` where `xyz` is the name of your profile. Run `pipenv shell` to activate virtualenv; this will automatically load the `.env` file too. Now, you can run `serverless deploy` and it will use the proper AWS credentials.
-
-	You can also set `--aws-profile PROFILE` to each serverless command.
-
-	For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
 
 ## Checking Logs
 
