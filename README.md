@@ -18,6 +18,14 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 2. Set up AWS Credentials.
 
+	You have two options for AWS Credentials: root user (easy, less secure) or creating IAM roles (slightly more work, more secure).
+
+	To get the root AWS credentials of your account, go here: https://console.aws.amazon.com/iam/home?#security_credential
+
+	To instead create a specific IAM user, go here: https://console.aws.amazon.com/iam/home?#/users You will need to allow the user to create lambdas, dynamo tables, and log groups.
+
+	Once you have the aws access key id and aws secret access key, this command below will help you set up the `default` profile for AWS:
+
 	```
 	aws configure
 	```
@@ -43,7 +51,9 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	**NOTE**  If you're using mutliple profiles and not using the `default` profile, you need to create a `.env` file and set `AWS_PROFILE=xyz` where `xyz` is the name of your profile. Run `pipenv shell` to activate virtualenv; this will automatically load the `.env` file too. Now, you can run `serverless deploy` and it will use the proper AWS credentials.
 
-	You can also set `--aws-profile PROFILE` to each serverless command. For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
+	You can also set `--aws-profile PROFILE` to each serverless command.
+
+	For help, see: https://serverless.com/framework/docs/providers/aws/guide/credentials/
 
 ## Checking Logs
 
