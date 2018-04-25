@@ -9,11 +9,12 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	Must have node and python3.6 installed.
 
 	```
+	brew install jq
 	pip3 install awscli
 	pip3 install pipenv
 	pipenv install
 	npm install -g serverless
-	npm install -g dynamodump
+	npm install -g @mapbox/dyno
 	npm install
 	```
 
@@ -90,10 +91,10 @@ The names of tables are `onondaga-e911-(all|closed)-(dev|prod)`. For example `on
 
 ### Export Single Date
 
-This command exports data from "2018-04-24" into a file named `events.json`.
+This command exports data from "2018-04-24".
 
 ```
-aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
+aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
 ```
 
 ### Export All Data
@@ -101,6 +102,6 @@ aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression
 Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database. Check [dynamo.md](./dynamo.md) for more details.
 
 ```
-dynamodump export-data --table onondaga-e911-all-dev --region us-east-1
-dynamodump export-data --table onondaga-e911-closed-dev --region us-east-1
+dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
+dyno scan us-east-1/onondaga-e911-closed-dev | jq -f filter.jq
 ```
