@@ -79,7 +79,7 @@ def scrape(event, context):
         row['timestamp_hash'] = row['timestamp'] + "_" + str(row['hash'])
         rows.append(row)
         print(i, row)
-        # ret = table.put_item(Item=row)
+        ret = table.put_item(Item=row)
         # print(ret)
 
     return rows
