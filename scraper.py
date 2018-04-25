@@ -1,13 +1,16 @@
+import io
 import os
 import json
 import boto3
 import arrow
+import decimal
 import logging
 import requests
-import datetime
 from bs4 import BeautifulSoup
+from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
+s3 = boto3.resource('s3')
 
 INIT_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
 
@@ -83,3 +86,34 @@ def scrape(event, context):
         # print(ret)
 
     return rows
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
+def archive(event, context):
+    bucket = s3.Bucket(os.environ['S3_BUCKET'])
+    prefix = os.environ['S3_PREFIX']
+    date = arrow.utcnow().to('US/Eastern').shift(days=-2).date().isoformat()
+    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+    response = table.query(KeyConditionExpression=Key('date').eq(date))
+    items = response['Items']
+    if len(items) == 0:
+        return
+    key = f"{prefix}{date}.json"
+    with io.StringIO() as f:
+        for item in items:
+            f.write(json.dumps(item, cls=DecimalEncoder) + "\n")
+        f.seek(0)
+        body = f.read()
+    ret = bucket.put_object(Key=key, Body=body, Metadata={
+        'Count': str(response['Count']),
+        'ScannedCount': str(response['ScannedCount']),
+        'ResponseMetadata': json.dumps(response['ResponseMetadata'])
+        })
+    return str(ret)

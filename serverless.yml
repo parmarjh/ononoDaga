@@ -33,9 +33,11 @@ provider:
         - dynamodb:GetShardIterator
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
+        - s3:PutObject
       Resource:
         - { "Fn::GetAtt": ["AllEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["ClosedEventsTable", "Arn"] }
+        - { "Fn::GetAtt": ["EventsBucket", "Arn"] }
 
 functions:
 
@@ -54,6 +56,24 @@ functions:
       DYNAMODB_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
     events:
       - schedule: rate(1 minute)
+
+  archive_all:
+    handler: scraper.archive
+    environment:
+      DYNAMODB_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
+      S3_BUCKET: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+      S3_PREFIX: all/
+    events:
+      - schedule: rate(1 day)
+
+  archive_closed:
+    handler: scraper.archive
+    environment:
+      DYNAMODB_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
+      S3_BUCKET: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+      S3_PREFIX: closed/
+    events:
+      - schedule: rate(1 day)
 
 resources:
   Resources:
@@ -105,3 +125,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    EventsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${opt:stage, self:provider.stage}
