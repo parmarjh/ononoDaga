@@ -15,8 +15,10 @@ CLOSED_EVENTS_URL = "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad91
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-def scrape(url, table):
-    table = dynamodb.Table(table)
+def scrape(event, context):
+
+    url = os.environ['SCRAPE_URL']
+    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
     response = requests.get(url)
 
@@ -58,9 +60,3 @@ def scrape(url, table):
         # print(ret)
 
     return rows
-
-def scrape_all(event, context):
-    return scrape(ALL_URL, os.environ['DYNAMODB_TABLE'] + "-all")
-
-def scrape_closed(event, context):
-    return scrape(CLOSED_EVENTS_URL, os.environ['DYNAMODB_TABLE'] + "-closed")
