@@ -64,15 +64,17 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 ## Checking Logs
 
+Function names are `scrape_all` or `scrape_closed`.
+
 ```
-serverless logs --function cron --tail
+serverless logs --function scrape_all --tail
 ```
 
 ## Running locally
 
 ```
 pipenv shell # activate python virtualenv
-serverless invoke local --function cron
+serverless invoke local --function scrape_all
 ```
 
 ## Deleting everything
