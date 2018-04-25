@@ -60,6 +60,8 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	serverless deploy
 	```
 
+	To deploy to production add `--stage prod` to the deploy command.
+
 ## Checking Logs
 
 ```
@@ -81,12 +83,14 @@ serverless remove
 
 ## Export Data
 
+The names of tables are `onondaga-e911-(all|closed)-(dev|prod)`. For example `onondaga-e911-all-dev`.
+
 ### Export Single Date
 
 This command exports data from "2018-04-24" into a file named `events.json`.
 
 ```
-aws dynamodb query --table-name onondaga-e911-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
+aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
 ```
 
 ### Export All Data
@@ -110,7 +114,7 @@ For help, see:
 This command exports the entire database into a file called `events.json`.
 
 ```
-aws dynamodb scan --table-name onondaga-e911-dev --output json > events.json
+aws dynamodb scan --table-name onondaga-e911-all-dev --output json > events.json
 ```
 
 **BONUS**
@@ -118,13 +122,13 @@ aws dynamodb scan --table-name onondaga-e911-dev --output json > events.json
 If you install jq (`brew install jq`), you can get proper line json using the following command:
 
 ```
-aws dynamodb scan --table-name onondaga-e911-dev --output json | jq -Mc '.Items[] | {timestamp: .timestamp.S, agency: .agency.S, category: .category.S, address: .address.S, township: .township.S, cross_streets: .cross_streets.S}'
+aws dynamodb scan --table-name onondaga-e911-all-dev --output json | jq -Mc '.Items[] | {timestamp: .timestamp.S, agency: .agency.S, category: .category.S, address: .address.S, township: .township.S, cross_streets: .cross_streets.S}'
 ```
 
 ### Check Read/Write Capacity Units
 
 ```
-aws dynamodb describe-table --table-name onondaga-e911-dev
+aws dynamodb describe-table --table-name onondaga-e911-all-dev
 ```
 
 Check:
@@ -141,5 +145,5 @@ Check:
 ### Increase Read Capacity Units
 
 ```
-aws dynamodb update-table --table-name onondaga-e911-dev --provisioned-throughput ReadCapacityUnits=10
+aws dynamodb update-table --table-name onondaga-e911-all-dev --provisioned-throughput ReadCapacityUnits=10
 ```

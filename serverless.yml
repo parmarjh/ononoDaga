@@ -64,7 +64,7 @@ resources:
       Properties:
         RetentionInDays: "7"
 
-    DynamoDbTable:
+    AllEventsTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
@@ -83,7 +83,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    DynamoDbTable:
+    ClosedEventsTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
