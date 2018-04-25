@@ -40,15 +40,26 @@ provider:
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
 functions:
-  cron:
-    handler: scraper.run
+
+  scrape_all:
+    handler: scraper.scrape_all
+    events:
+      - schedule: rate(1 minute)
+
+  scrape_closed:
+    handler: scraper.scrape_closed
     events:
       - schedule: rate(1 minute)
 
 resources:
   Resources:
 
-    CronLogGroup:
+    ScrapeUnderScoreAllLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        RetentionInDays: "7"
+
+    ScrapeUnderScoreClosedLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "7"
@@ -57,18 +68,35 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}-all
         AttributeDefinitions:
           - AttributeName: date
             AttributeType: S
           - AttributeName: timestamp_hash
             AttributeType: S
         KeySchema:
-          # NOTES: this creates one hot partition for each day's writes.
-          #        this is bad practice for high scale
-          - AttributeName: date # partition key
+          - AttributeName: date
             KeyType: HASH
-          - AttributeName: timestamp_hash # sort key
+          - AttributeName: timestamp_hash
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    DynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}-closed
+        AttributeDefinitions:
+          - AttributeName: date
+            AttributeType: S
+          - AttributeName: timestamp_hash
+            AttributeType: S
+        KeySchema:
+          - AttributeName: date
+            KeyType: HASH
+          - AttributeName: timestamp_hash
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1

@@ -15,15 +15,14 @@ CLOSED_EVENTS_URL = "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad91
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-def run(event, context):
-
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+def scrape(url, table):
+    table = dynamodb.Table(table)
 
     current_time = datetime.datetime.now().time()
     name = context.function_name
     logger.info("Your cron function " + name + " ran at " + str(current_time))
 
-    response = requests.get(ALL_URL)
+    response = requests.get(url)
 
     if "There are currently no active events for this agency" in response.text:
         print("No events found.")
@@ -63,3 +62,9 @@ def run(event, context):
         print(ret)
 
     return rows
+
+def scrape_all(event, context):
+    return scrape(ALL_URL, os.environ['DYNAMODB_TABLE'] + "-all")
+
+def scrape_closed(event, context):
+    return scrape(CLOSED_EVENTS_URL, os.environ['DYNAMODB_TABLE'] + "-closed")

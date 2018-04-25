@@ -22,7 +22,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	To get the root AWS credentials of your account, go here: https://console.aws.amazon.com/iam/home?#security_credential
 
-	To instead create a specific IAM user, go here: https://console.aws.amazon.com/iam/home?#/users You will need to allow the user to create lambdas, dynamo tables, and log groups.
+	To instead create a specific IAM user, go here: https://console.aws.amazon.com/iam/home?#/users You will need to allow the user to create lambdas, dynamodb tables, and log groups.
 
 	Once you have the aws access key id and aws secret access key, this command below will help you set up the `default` profile for AWS:
 
