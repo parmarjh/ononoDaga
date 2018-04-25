@@ -19,10 +19,6 @@ provider:
   name: aws
   runtime: python3.6
   region: us-east-1
-  environment:
-    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
-    # FIREHOSE_STREAM: ${self:service}-${opt:stage, self:provider.stage}
-    # S3_BUCKET: ${self:service}-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -43,11 +39,15 @@ functions:
 
   scrape_all:
     handler: scraper.scrape_all
+    environment:
+      DYNAMODB_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
     events:
       - schedule: rate(1 minute)
 
   scrape_closed:
     handler: scraper.scrape_closed
+    environment:
+      DYNAMODB_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
     events:
       - schedule: rate(1 minute)
 
@@ -68,7 +68,7 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}-all
+        TableName: ${self:service}-all-${opt:stage, self:provider.stage}
         AttributeDefinitions:
           - AttributeName: date
             AttributeType: S
@@ -87,7 +87,7 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}-closed
+        TableName: ${self:service}-closed-${opt:stage, self:provider.stage}
         AttributeDefinitions:
           - AttributeName: date
             AttributeType: S
