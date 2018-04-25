@@ -86,7 +86,7 @@ serverless remove
 This command exports data from "2018-04-24" into a file named `events.json`.
 
 ```
-aws dynamodb query --table-name onondaga-e911 --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
+aws dynamodb query --table-name onondaga-e911-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' > events.json
 ```
 
 ### Export All Data
@@ -110,13 +110,13 @@ For help, see:
 This command exports the entire database into a file called `events.json`.
 
 ```
-aws dynamodb scan --table-name onondaga-e911 --output json > events.json
+aws dynamodb scan --table-name onondaga-e911-dev --output json > events.json
 ```
 
 ### Check Read/Write Capacity Units
 
 ```
-aws dynamodb describe-table --table-name onondaga-e911
+aws dynamodb describe-table --table-name onondaga-e911-dev
 ```
 
 Check:
@@ -133,5 +133,5 @@ Check:
 ### Increase Read Capacity Units
 
 ```
-aws dynamodb update-table --table-name onondaga-e911 --provisioned-throughput ReadCapacityUnits=10
+aws dynamodb update-table --table-name onondaga-e911-dev --provisioned-throughput ReadCapacityUnits=10
 ```
