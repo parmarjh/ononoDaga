@@ -102,4 +102,5 @@ Please note that the database is provisioned with 1 read capacity unit (RCU). Yo
 
 ```
 dynamodump export-data --table onondaga-e911-all-dev --region us-east-1
+dynamodump export-data --table onondaga-e911-closed-dev --region us-east-1
 ```
