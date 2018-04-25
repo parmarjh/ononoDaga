@@ -13,6 +13,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	pip3 install pipenv
 	pipenv install
 	npm install -g serverless
+	npm install -g dynamodump
 	npm install
 	```
 
@@ -97,55 +98,8 @@ aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression
 
 ### Export All Data
 
-Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database.
-
-To summarize, 1 RCU means 2 eventually consistent items read per second. Let's say you're downloading 1 item per minute for the entire year. That's 525,600 items.
-
-At 1 RCU (2 eventually consistent reads per second), 525600 / 2 = 262800 seconds = 73 hours. Obviously, this is prohibitively slow.
-
-If you up the RCU to 50000 (10k eventually consistent reads per second), it will now perform in 525600 / 10000 = 52.56 seconds.
-
-Cost is $0.00013 per RCU per hour (~$0.09 per month) where 1 RCU provides up to 7,200 reads per hour.
-
-**If you set the RCU to 5000, be sure to set it back to 1 within the hour! If you paid for a full month of 5000 RCU, your bill could easily hit $475 for the month!** For just 1 hour at 5000 RCU, you only pay $0.65.
-
-For help, see:
-- https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ProvisionedThroughput.html
-- https://aws.amazon.com/dynamodb/faqs/#What_is_a_readwrite_capacity_unit
-
-This command exports the entire database into a file called `events.json`.
+Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database. Check [dynamo.md](./dynamo.md) for more details.
 
 ```
-aws dynamodb scan --table-name onondaga-e911-all-dev --output json > events.json
-```
-
-**BONUS**
-
-If you install jq (`brew install jq`), you can get proper line json using the following command:
-
-```
-aws dynamodb scan --table-name onondaga-e911-all-dev --output json | jq -Mc '.Items[] | {timestamp: .timestamp.S, agency: .agency.S, category: .category.S, address: .address.S, township: .township.S, cross_streets: .cross_streets.S}'
-```
-
-### Check Read/Write Capacity Units
-
-```
-aws dynamodb describe-table --table-name onondaga-e911-all-dev
-```
-
-Check:
-
-```
-"ProvisionedThroughput": {
-    "NumberOfDecreasesToday": 0,
-    "ReadCapacityUnits": 1,
-    "WriteCapacityUnits": 1
-},
-```
-
-
-### Increase Read Capacity Units
-
-```
-aws dynamodb update-table --table-name onondaga-e911-all-dev --provisioned-throughput ReadCapacityUnits=10
+dynamodump export-data --table onondaga-e911-all-dev --region us-east-1
 ```
