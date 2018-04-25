@@ -59,7 +59,7 @@ def scrape(url, table):
         rows.append(row)
         print(i, row)
         ret = table.put_item(Item=row)
-        print(ret)
+        # print(ret)
 
     return rows
 
