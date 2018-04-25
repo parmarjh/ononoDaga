@@ -105,3 +105,10 @@ Please note that the database is provisioned with 1 read capacity unit (RCU). Yo
 dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
 dyno scan us-east-1/onondaga-e911-closed-dev | jq -f filter.jq
 ```
+
+You can pipe this into a file to save the data. This pipes the output into `onondaga-e911-all-dev.json` and `onondaga-e911-closed-dev.json` respectively.
+
+```
+dyno scan us-east-1/onondaga-e911-all-dev | jq -Mcf filter.jq > onondaga-e911-all-dev.json
+dyno scan us-east-1/onondaga-e911-closed-dev | jq -Mcf filter.jq > onondaga-e911-closed-dev.json
+```

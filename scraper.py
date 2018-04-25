@@ -99,21 +99,24 @@ class DecimalEncoder(json.JSONEncoder):
 def archive(event, context):
     bucket = s3.Bucket(os.environ['S3_BUCKET'])
     prefix = os.environ['S3_PREFIX']
-    date = arrow.utcnow().to('US/Eastern').shift(days=-2).date().isoformat()
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-    response = table.query(KeyConditionExpression=Key('date').eq(date))
-    items = response['Items']
-    if len(items) == 0:
-        return
-    key = f"{prefix}{date}.json"
-    with io.StringIO() as f:
-        for item in items:
-            f.write(json.dumps(item, cls=DecimalEncoder) + "\n")
-        f.seek(0)
-        body = f.read()
-    ret = bucket.put_object(Key=key, Body=body, Metadata={
-        'Count': str(response['Count']),
-        'ScannedCount': str(response['ScannedCount']),
-        'ResponseMetadata': json.dumps(response['ResponseMetadata'])
-        })
-    return str(ret)
+    for days_ago in range(0,2+1): # today, yesterday, two days ago
+        date = arrow.utcnow().to('US/Eastern').shift(days=-days_ago).date().isoformat()
+        print(f"archiving data for {date}")
+        table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+        response = table.query(KeyConditionExpression=Key('date').eq(date))
+        items = response['Items']
+        if len(items) == 0:
+            print("no items found in dynamo table")
+            return
+        key = f"{prefix}{date}.json"
+        with io.StringIO() as f:
+            for item in items:
+                f.write(json.dumps(item, cls=DecimalEncoder) + "\n")
+            f.seek(0)
+            body = f.read()
+        ret = bucket.put_object(Key=key, Body=body, Metadata={
+            'Count': str(response['Count']),
+            'ScannedCount': str(response['ScannedCount']),
+            'ResponseMetadata': json.dumps(response['ResponseMetadata'])
+            })
+        print(ret)
