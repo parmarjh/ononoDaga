@@ -113,6 +113,14 @@ This command exports the entire database into a file called `events.json`.
 aws dynamodb scan --table-name onondaga-e911-dev --output json > events.json
 ```
 
+**BONUS**
+
+If you install jq (`brew install jq`), you can get proper line json using the following command:
+
+```
+aws dynamodb scan --table-name onondaga-e911-dev --output json | jq -Mc '.Items[] | {timestamp: .timestamp.S, agency: .agency.S, category: .category.S, address: .address.S, township: .township.S, cross_streets: .cross_streets.S}'
+```
+
 ### Check Read/Write Capacity Units
 
 ```
