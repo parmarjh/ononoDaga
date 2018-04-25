@@ -18,10 +18,6 @@ logger.setLevel(logging.INFO)
 def scrape(url, table):
     table = dynamodb.Table(table)
 
-    current_time = datetime.datetime.now().time()
-    name = context.function_name
-    logger.info("Your cron function " + name + " ran at " + str(current_time))
-
     response = requests.get(url)
 
     if "There are currently no active events for this agency" in response.text:
