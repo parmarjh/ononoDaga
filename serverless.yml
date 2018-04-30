@@ -40,7 +40,7 @@ provider:
         - { "Fn::GetAtt": ["AllEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["ClosedEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["EventsBucket", "Arn"] }
-        - { "Fn::Join": [ { "Fn::GetAtt": ["EventsBucket", "Arn"] }, "/*"] }
+        - { "Fn::Join": [ "", [ { "Fn::GetAtt": ["EventsBucket", "Arn"] }, "/*"] ] }
 
 functions:
 
