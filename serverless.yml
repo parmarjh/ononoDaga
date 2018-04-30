@@ -40,6 +40,7 @@ provider:
         - { "Fn::GetAtt": ["AllEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["ClosedEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["EventsBucket", "Arn"] }
+        - { "Fn::Join": [ { "Fn::GetAtt": ["EventsBucket", "Arn"] }, "/*"] }
 
 functions:
 
@@ -66,7 +67,7 @@ functions:
       S3_BUCKET: ${self:resources.Resources.EventsBucket.Properties.BucketName}
       S3_PREFIX: all/
     events:
-      - schedule: rate(1 day)
+      - schedule: rate(1 hour)
 
   archive_closed:
     handler: scraper.archive
@@ -75,7 +76,7 @@ functions:
       S3_BUCKET: ${self:resources.Resources.EventsBucket.Properties.BucketName}
       S3_PREFIX: closed/
     events:
-      - schedule: rate(1 day)
+      - schedule: rate(1 hour)
 
 resources:
   Resources:
@@ -130,5 +131,6 @@ resources:
 
     EventsBucket:
       Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
       Properties:
         BucketName: ${self:service}-${opt:stage, self:provider.stage}
