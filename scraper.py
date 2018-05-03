@@ -115,6 +115,7 @@ def archive(event, context):
             f.seek(0)
             body = f.read()
         ret = bucket.put_object(Key=key, Body=body, Metadata={
+            'ContentType': 'application/json',
             'Count': str(response['Count']),
             'ScannedCount': str(response['ScannedCount']),
             'ResponseMetadata': json.dumps(response['ResponseMetadata'])
