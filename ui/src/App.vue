@@ -22,12 +22,12 @@
         <td>{{ index+1 }}</td>
         <td>{{ row.agency }}</td>
         <td style="white-space:nowrap;">{{ format(row.timestamp, 'h:mm A') }}</td>
-        <td>{{ row.category }}</td>
-        <td>{{[row.address_pre,
-               row.address_name,
-               row.address_type,
-               row.address_suffix,
-               row.address_place].filter(val => val).join(' ')}}</td>
+        <td>{{ row.category }} {{ row.category_detail }}</td>
+        <td>{{[row.addr_pre,
+               row.addr_name,
+               row.addr_type,
+               row.addr_suffix,
+               row.addr_place].filter(val => val).join(' ')}}</td>
         <td>{{ row.municipality }}</td>
         <td>{{ row.cross_street1 }} &amp; {{ row.cross_street2 }}</td>
       </tr>
