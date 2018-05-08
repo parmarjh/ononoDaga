@@ -47,6 +47,7 @@ functions:
   scrape_all:
     handler: scraper.scrape
     environment:
+      PYTHONHASHSEED: 0
       SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink1Action&_rvip=/events.jsp"
       DYNAMODB_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
     events:
@@ -55,6 +56,7 @@ functions:
   scrape_closed:
     handler: scraper.scrape
     environment:
+      PYTHONHASHSEED: 0
       SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink7Action&_rvip=/events.jsp"
       DYNAMODB_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
     events:
