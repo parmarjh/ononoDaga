@@ -16,6 +16,7 @@
         <th>Category</th>
         <th>Address</th>
         <th>Municipality</th>
+        <th>Cross Streets</th>
       </thead>
       <tr v-for="(row, index) in rows" :key="row.timestamp_hash">
         <td>{{ index+1 }}</td>
@@ -28,6 +29,7 @@
                row.address_suffix,
                row.address_place].filter(val => val).join(' ')}}</td>
         <td>{{ row.municipality }}</td>
+        <td>{{ row.cross_street1 }} &amp; {{ row.cross_street2 }}</td>
       </tr>
     </table>
   </div>
