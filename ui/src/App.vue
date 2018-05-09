@@ -11,6 +11,7 @@
     <table>
       <thead>
         <th>#</th>
+        <th>Inserted At</th>
         <th>Agency</th>
         <th>Time</th>
         <th>Category</th>
@@ -20,6 +21,7 @@
       </thead>
       <tr v-for="(row, index) in rows" :key="row.timestamp_hash">
         <td>{{ index+1 }}</td>
+        <td>{{ format(row.inserted_at, 'h:mm A') }}</td>
         <td>{{ row.agency }}</td>
         <td style="white-space:nowrap;">{{ format(row.timestamp, 'h:mm A') }}</td>
         <td>{{ row.category }} {{ row.category_detail }}</td>
