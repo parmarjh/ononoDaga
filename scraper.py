@@ -84,7 +84,7 @@ def scrape(event, context):
         hasher.update(string_to_hash.encode('utf-8'))
         row['hash'] = hasher.hexdigest()
 
-        row['timestamp_hash'] = row['timestamp'] + "_" + str(row['hash'])
+        row['timestamp_hash'] = timestamp_hash = row['timestamp'] + "_" + str(row['hash'])
         rows.append(row)
         if not IS_LOCAL:
             try:
