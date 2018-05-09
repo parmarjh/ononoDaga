@@ -140,6 +140,12 @@ resources:
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins: ["*"]
+              AllowedHeaders: ["*"]
+              AllowedMethods: ["GET"]
+              MaxAge: "3600"
 
     EventsBucketPolicy:
       Type: AWS::S3::BucketPolicy

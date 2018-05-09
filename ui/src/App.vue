@@ -84,7 +84,7 @@ export default {
 body {
   margin: 0 auto;
   max-width: 75%;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 input, select, button, table {
