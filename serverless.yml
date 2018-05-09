@@ -4,7 +4,6 @@ frameworkVersion: ">=1.2.0 <2.0.0"
 
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
   - serverless-plugin-additional-stacks
 
 package:
@@ -136,7 +135,21 @@ resources:
       Type: AWS::S3::Bucket
       # DeletionPolicy: Retain
       Properties:
+        BucketName: ${self:service}-${opt:stage, self:provider.stage}
         AccessControl: PublicRead
-        BucketName: "#{AWS::AccountId}-${self:service}-${opt:stage, self:provider.stage}"
         WebsiteConfiguration:
           IndexDocument: index.html
+          ErrorDocument: index.html
+
+    EventsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: EventsBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action: ["s3:GetObject"]
+              Resource: { "Fn::Join": [ "", [ { "Fn::GetAtt": ["EventsBucket", "Arn"] }, "/*"] ] }
