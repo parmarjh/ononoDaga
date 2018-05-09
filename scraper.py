@@ -9,7 +9,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from boto3.dynamodb.conditions import Key, Attr
-from botocore.errorfactory import ConditionalCheckFailedException
+import botocore
 
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.resource('s3')
@@ -90,8 +90,11 @@ def scrape(event, context):
             try:
                 ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
                 print(f"saved {timestamp_hash}")
-            except ConditionalCheckFailedException:
-                print(f"skipping {timestamp_hash}, already saved")
+            except botocore.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
+                    print(f"skipping {timestamp_hash}, already saved")
+                else:
+                    raise
 
     return rows
 
