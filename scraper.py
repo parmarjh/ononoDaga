@@ -86,15 +86,15 @@ def scrape(event, context):
 
         row['timestamp_hash'] = timestamp_hash = row['timestamp'] + "_" + str(row['hash'])
         rows.append(row)
-        if not IS_LOCAL:
-            try:
-                ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
-                print(f"saved {timestamp_hash}")
-            except botocore.exceptions.ClientError as e:
-                if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
-                    print(f"skipping {timestamp_hash}, already saved")
-                else:
-                    raise
+
+        try:
+            ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
+            print(f"saved {timestamp_hash}")
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
+                print(f"skipping {timestamp_hash}, already saved")
+            else:
+                raise
 
     return rows
 
