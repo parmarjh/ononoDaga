@@ -9,10 +9,12 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from boto3.dynamodb.conditions import Key, Attr
+from botocore.errorfactory import ConditionalCheckFailedException
 
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.resource('s3')
 
+IS_LOCAL = os.getenv('IS_LOCAL')
 INIT_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
 
 logger = logging.getLogger(__name__)
@@ -78,14 +80,18 @@ def scrape(event, context):
         row = {k:v if v is not '' else None for k,v in row.items()}
 
         hasher = hashlib.sha1()
-        # print(tuple(row[x] for x in hashable_keys))
         string_to_hash = ' '.join(row[x] for x in hashable_keys if row[x])
         hasher.update(string_to_hash.encode('utf-8'))
         row['hash'] = hasher.hexdigest()
 
         row['timestamp_hash'] = row['timestamp'] + "_" + str(row['hash'])
         rows.append(row)
-        ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
+        if not IS_LOCAL:
+            try:
+                ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
+                print(f"saved {timestamp_hash}")
+            except ConditionalCheckFailedException:
+                print(f"skipping {timestamp_hash}, already saved")
 
     return rows
 

@@ -4,6 +4,8 @@ frameworkVersion: ">=1.2.0 <2.0.0"
 
 plugins:
   - serverless-python-requirements
+  - serverless-pseudo-parameters
+  - serverless-plugin-additional-stacks
 
 package:
   exclude:
@@ -33,13 +35,14 @@ provider:
         - dynamodb:GetShardIterator
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
-        - s3:ListBucket
-        - s3:GetObject
-        - s3:PutObject
       Resource:
         - { "Fn::GetAtt": ["AllEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["ClosedEventsTable", "Arn"] }
-        - { "Fn::GetAtt": ["EventsBucket", "Arn"] }
+    -  Effect: "Allow"
+       Action:
+         - s3:PutObject
+         - s3:GetObject
+       Resource:
         - { "Fn::Join": [ "", [ { "Fn::GetAtt": ["EventsBucket", "Arn"] }, "/*"] ] }
 
 functions:
@@ -93,7 +96,7 @@ resources:
 
     AllEventsTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:service}-all-${opt:stage, self:provider.stage}
         AttributeDefinitions:
@@ -112,7 +115,7 @@ resources:
 
     ClosedEventsTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:service}-closed-${opt:stage, self:provider.stage}
         AttributeDefinitions:
@@ -131,6 +134,9 @@ resources:
 
     EventsBucket:
       Type: AWS::S3::Bucket
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
-        BucketName: ${self:service}-${opt:stage, self:provider.stage}
+        AccessControl: PublicRead
+        BucketName: "#{AWS::AccountId}-${self:service}-${opt:stage, self:provider.stage}"
+        WebsiteConfiguration:
+          IndexDocument: index.html
