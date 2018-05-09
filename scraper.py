@@ -73,6 +73,7 @@ def scrape(event, context):
             "municipality": row_el.select('td')[4].text.strip(), # mun2
             "cross_street1": row_el.select('td')[5].select('[id$=xstreet11]')[0].text,
             "cross_street2": row_el.select('td')[5].select('[id$=xstreet21]')[0].text,
+            "inserted_at": arrow.utcnow().to("US/Eastern").isoformat()
         }
 
         # convert empty string to null because dynamodb doesn't support it yet
