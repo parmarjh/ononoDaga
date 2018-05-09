@@ -118,7 +118,7 @@ def archive(event, context):
         items = response['Items']
         if len(items) == 0:
             print("no items found in dynamo table")
-            return
+            continue
         key = f"{prefix}{date}.json"
         with io.StringIO() as f:
             for item in items:
