@@ -11,7 +11,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 - `onondaga-e911-all-(dev|prod)`
 - `onondaga-e911-closed-(dev|prod)`
-- `onondaga-e911-all-(dev|prod)`
+- `onondaga-e911-pending-(dev|prod)`
 
 **S3 Folders**:
 
@@ -22,7 +22,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 ## Caveats
 
 - **Unique Ids**: The majority of issues with the data stem from the fact that there is no unique id per row. To fix this, we create a SHA1 hash of all of the text (excluding the timestamp).
-	- The primary key for the `all` and `closed` tables is `{timestamp}_{hash}`. The timestamp for the `pending` table is `{insertion_date}_{hash}`.
+	- The primary key (unique identifier) for the `all` and `closed` tables is `{timestamp}_{hash}`. The timestamp for the `pending` table is `{insertion_date}_{hash}`.
 	- Keep in mind that the exact same row data (consisting of agency, address, cross streets etc.) can and very likely will happen multiple times so the `hash` by itself is not globally unique. The `timestamp` is not included as part of the `hash` because there is no fixed timestamp for pending events.
 
 - **Immutable Data**: We assume that the data in the tables are an immutable stream which means that the data in each row is unchanging, and rows are just streaming in and out as events change status (active->closed). Our job is just catching the rows from the table before they disappear. If any data in a row changes (is not immutable), it will be recorded as a new row because the row's `hash` will change. We observed one such case for an item pending dispatch:
