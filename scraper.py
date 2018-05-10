@@ -71,7 +71,9 @@ def parse_and_save(soup):
         timestamp_str = row_el.select('td')[1].text.strip()
         if timestamp_str == 'Dispatch Pending':
             pending = True
-            row['id'] = inserted_timestamp.isoformat() + "_" + row_hash
+            # WARNING: if event remains pending near midnight (EST),
+            # it will create a duplicate event for the next day
+            row['id'] = inserted_timestamp.date().isoformat() + "_" + row_hash
         else:
             timestamp = arrow.get(timestamp_str, "MM/DD/YY HH:mm", tzinfo="US/Eastern")
             row['date'] = timestamp.date().isoformat()
