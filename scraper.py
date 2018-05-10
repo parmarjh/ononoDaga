@@ -14,6 +14,7 @@ import botocore
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.resource('s3')
 
+SCRAPE_PAGE = os.getenv('SCRAPE_PAGE')
 IS_LOCAL = os.getenv('IS_LOCAL')
 INIT_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
 
@@ -28,7 +29,6 @@ hashable_keys = [
 def scrape(event, context):
 
     url = os.environ['SCRAPE_URL']
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
     
     s = requests.Session()
 
@@ -51,18 +51,12 @@ def scrape(event, context):
     last_update = soup.select("#cdate")[0].text
     print(last_update)
 
-    rows = []
     for i, row_el in enumerate(soup.select('.dataTableEx > tbody > tr')):
 
-        timestamp_str = row_el.select('td')[1].text.strip()
-        if timestamp_str == 'Dispatch Pending':
-            continue
-        timestamp = arrow.get(timestamp_str, "MM/DD/YY HH:mm", tzinfo="US/Eastern")
+        inserted_timestamp = arrow.utcnow().to("US/Eastern")
 
         row = {
             "agency": row_el.select('td')[0].text.strip(),
-            "date": timestamp.date().isoformat(),
-            "timestamp": timestamp.isoformat(),
             "category": row_el.select('td')[2].select("span")[0].text.strip(),
             "category_details": row_el.select('td')[2].select("span")[1].text.strip() if len(row_el.select('td')[2].select("span")) > 1 else "",
             "addr_pre": row_el.select('td')[3].select("span")[0].text.strip(), # edirpre1
@@ -73,7 +67,8 @@ def scrape(event, context):
             "municipality": row_el.select('td')[4].text.strip(), # mun2
             "cross_street1": row_el.select('td')[5].select('[id$=xstreet11]')[0].text,
             "cross_street2": row_el.select('td')[5].select('[id$=xstreet21]')[0].text,
-            "inserted_at": arrow.utcnow().to("US/Eastern").isoformat()
+            "inserted_timestamp": inserted_timestamp.isoformat(),
+            "inserted_date": inserted_timestamp.date().isoformat(),
         }
 
         # convert empty string to null because dynamodb doesn't support it yet
@@ -83,21 +78,36 @@ def scrape(event, context):
         hasher = hashlib.sha1()
         string_to_hash = ' '.join(row[x] for x in hashable_keys if row[x])
         hasher.update(string_to_hash.encode('utf-8'))
-        row['hash'] = hasher.hexdigest()
+        row_hash = row['hash'] = hasher.hexdigest()
 
-        row['timestamp_hash'] = timestamp_hash = row['timestamp'] + "_" + str(row['hash'])
-        rows.append(row)
+        pending = False
+        timestamp_str = row_el.select('td')[1].text.strip()
+        if timestamp_str == 'Dispatch Pending':
+            pending = True
+            row['id'] = inserted_timestamp.isoformat() + "_" + row_hash
+        else:
+            timestamp = arrow.get(timestamp_str, "MM/DD/YY HH:mm", tzinfo="US/Eastern")
+            row['date'] = timestamp.date().isoformat()
+            row['timestamp'] = timestamp.isoformat()
+            row['id'] = timestamp.isoformat() + "_" + row_hash
+
+        if SCRAPE_PAGE == 'all':
+            if pending:
+                table = dynamodb.Table(os.environ['PENDING_EVENTS_TABLE'])
+            else:
+                table = dynamodb.Table(os.environ['ALL_EVENTS_TABLE'])
+        else:
+            assert not pending
+            table = dynamodb.Table(os.environ['CLOSED_EVENTS_TABLE'])
 
         try:
-            ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(timestamp_hash)')
-            print(f"saved {timestamp_hash}")
+            ret = table.put_item(Item=row, ConditionExpression='attribute_not_exists(id)')
+            print(f"saved {row['id']} to {table.table_name}")
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
-                print(f"skipping {timestamp_hash}, already saved")
+                print(f"skipping {row['id']}, already saved in {table.table_name}")
             else:
                 raise
-
-    return rows
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -133,3 +143,18 @@ def archive(event, context):
             'ResponseMetadata': json.dumps(response['ResponseMetadata'])
             })
         print(ret)
+
+# https://serverless.com/framework/docs/providers/aws/events/apigateway/#request-parameters
+# def list_events(event, context):
+#     table = dynamodb.Table(os.environ['ALL_EVENTS_TABLE'])
+
+#     # fetch all todos from the database
+#     result = table.scan()
+
+#     # create a response
+#     response = {
+#         "statusCode": 200,
+#         "body": json.dumps(result['Items'], cls=DecimalEncoder)
+#     }
+
+#     return response

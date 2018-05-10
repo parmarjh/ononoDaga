@@ -83,7 +83,10 @@ serverless invoke local --function scrape_all
 
 ## Deleting everything
 
+For `dev` stage:
+
 ```
+aws s3 rm --recursive s3://onondaga-e911-dev
 serverless remove
 ```
 

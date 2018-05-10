@@ -8,28 +8,38 @@
     <input v-model="date"></input>
     <button v-on:click="fetchData">Fetch</button>
     <br/><br/>
+    <div style='width:100%; margin:0px auto; display:inline-block;'>
+    <button v-on:click="prevDay" style="float: left;">←</button>
+    <button v-on:click="nextDay" style="float: right;">→</button>
+    <br/><br/>
+    </div>
     <table>
       <thead>
         <th>#</th>
-        <th>Inserted At</th>
+        <th>Hash</th>
+        <th>Inserted</th>
         <th>Agency</th>
         <th>Time</th>
         <th>Category</th>
+        <th>Details</th>
         <th>Address</th>
+        <th>Place</th>
         <th>Municipality</th>
         <th>Cross Streets</th>
       </thead>
       <tr v-for="(row, index) in rows" :key="row.timestamp_hash">
         <td>{{ index+1 }}</td>
-        <td>{{ format(row.inserted_at, 'h:mm A') }}</td>
+        <td :title="row.hash">{{ row.hash.slice(0,10) }}</td>
+        <td style="white-space:nowrap;">{{ format(row.inserted_timestamp, 'h:mm A') }}</td>
         <td>{{ row.agency }}</td>
         <td style="white-space:nowrap;">{{ format(row.timestamp, 'h:mm A') }}</td>
-        <td>{{ row.category }} {{ row.category_detail }}</td>
+        <td>{{ row.category }}</td>
+        <td>{{ row.category_details }}</td>
         <td>{{[row.addr_pre,
                row.addr_name,
                row.addr_type,
-               row.addr_suffix,
-               row.addr_place].filter(val => val).join(' ')}}</td>
+               row.addr_suffix].filter(val => val).join(' ')}}</td>
+        <td>{{ row.addr_place }}</td>
         <td>{{ row.municipality }}</td>
         <td>{{ row.cross_street1 }} &amp; {{ row.cross_street2 }}</td>
       </tr>
@@ -39,7 +49,7 @@
 <script>
 
 import ndjsonStream from 'can-ndjson-stream';
-import format from 'date-fns/format';
+import { format, addDays } from 'date-fns';
 
 const fetchNdjson = async function* (url) {
   const response = await fetch(url);
@@ -73,6 +83,14 @@ export default {
       for await (const row of gen) rows.push(row);
       this.rows = rows;
     },
+    nextDay: async function() {
+      this.date = format(addDays(this.date, 1), 'YYYY-MM-DD');
+      await this.fetchData();
+    },
+    prevDay: async function() {
+      this.date = format(addDays(this.date, -1), 'YYYY-MM-DD');
+      await this.fetchData();
+    },
     format
   }
 }
@@ -83,8 +101,8 @@ export default {
 
 body {
   margin: 0 auto;
-  max-width: 75%;
-  font-size: 14px;
+  max-width: 85%;
+  font-size: 12px;
 }
 
 input, select, button, table {
@@ -131,8 +149,8 @@ table {
 }
 
 table, th, td {
-   border: 1px solid #eee;
-   padding: 0px 10px;
+  border: 1px solid #eee;
+  padding: 0px 10px;
 }
 
 </style>

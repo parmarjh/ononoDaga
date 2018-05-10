@@ -4,7 +4,6 @@ frameworkVersion: ">=1.2.0 <2.0.0"
 
 plugins:
   - serverless-python-requirements
-  - serverless-plugin-additional-stacks
 
 package:
   exclude:
@@ -46,19 +45,33 @@ provider:
 
 functions:
 
+  # list:
+  #   handler: scraper.list_events
+  #   events:
+  #     - http:
+  #         path: events
+  #         method: get
+  #         cors: true
+
   scrape_all:
     handler: scraper.scrape
     environment:
+      SCRAPE_PAGE: "all"
       SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink1Action&_rvip=/events.jsp"
-      DYNAMODB_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
+      PENDING_EVENTS_TABLE: ${self:resources.Resources.PendingEventsTable.Properties.TableName}
+      ALL_EVENTS_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
+      CLOSED_EVENTS_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
     events:
       - schedule: rate(1 minute)
 
   scrape_closed:
     handler: scraper.scrape
     environment:
+      SCRAPE_PAGE: "closed"
       SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink7Action&_rvip=/events.jsp"
-      DYNAMODB_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
+      PENDING_EVENTS_TABLE: ${self:resources.Resources.PendingEventsTable.Properties.TableName}
+      ALL_EVENTS_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
+      CLOSED_EVENTS_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
     events:
       - schedule: rate(1 minute)
 
@@ -93,6 +106,25 @@ resources:
       Properties:
         RetentionInDays: "7"
 
+    PendingEventsTable:
+      Type: 'AWS::DynamoDB::Table'
+      # DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:service}-closed-${opt:stage, self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: inserted_date
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: inserted_date
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
     AllEventsTable:
       Type: 'AWS::DynamoDB::Table'
       # DeletionPolicy: Retain
@@ -101,12 +133,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: date
             AttributeType: S
-          - AttributeName: timestamp_hash
+          - AttributeName: id
             AttributeType: S
         KeySchema:
           - AttributeName: date
             KeyType: HASH
-          - AttributeName: timestamp_hash
+          - AttributeName: id
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -120,12 +152,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: date
             AttributeType: S
-          - AttributeName: timestamp_hash
+          - AttributeName: id
             AttributeType: S
         KeySchema:
           - AttributeName: date
             KeyType: HASH
-          - AttributeName: timestamp_hash
+          - AttributeName: id
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
