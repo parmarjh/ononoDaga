@@ -22,7 +22,7 @@ aws s3 ls s3://onondaga-e911-dev/pending/
 
 ## Caveats
 
-- **Unique Ids**: The majority of issues with the data stem from the fact that there is no unique id per row. To fix this, we create a SHA1 hash of all of the text (**excluding the timestamp**).
+- **Unique Ids**: The majority of issues with the data stem from the fact that there is no unique id per row. To fix this, we create a SHA1 hash of all of the text (excluding the timestamp).
 	- The primary key for the `all` and `closed` tables is `{timestamp}_{hash}`. The timestamp for the `pending` table is `{insertion_date}_{hash}`.
 	- Keep in mind that the exact same row data (consisting of agency, address, cross streets etc.) can and very likely will happen multiple times so the `hash` by itself is not globally unique. The `timestamp` is not included as part of the `hash` because there is no fixed timestamp for pending events.
 
