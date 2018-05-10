@@ -1,8 +1,36 @@
 # onondaga-e911
 
-https://s3.amazonaws.com/onondaga-e911-dev/index.html
+## Data
+
+**UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
+
+**DynamoDB Tables**
+
+- `onondaga-e911-all-dev`
+- `onondaga-e911-closed-dev`
+- `onondaga-e911-all-dev`
+
+**Data Dumps**:
+
+```
+aws s3 ls s3://onondaga-e911-dev/all/
+aws s3 ls s3://onondaga-e911-dev/closed/
+aws s3 ls s3://onondaga-e911-dev/pending/
+```
 
 Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
+
+## Caveats
+
+- **Unique Ids**: The majority of issues with the data stem from the fact that there is no unique id per row. To fix this, we create a SHA1 hash of all of the text (**excluding the timestamp**).
+	- The primary key for the `all` and `closed` tables is `{timestamp}_{hash}`. The timestamp for the `pending` table is `{insertion_date}_{hash}`.
+	- Keep in mind that the exact same row data (consisting of agency, address, cross streets etc.) can and very likely will happen multiple times so the `hash` by itself is not globally unique. The timestamp is not included as part of the `hash` to help map to the pending table where no timestamp is available.
+
+- **Linking Data**: Data for pending/all/closed events is stored in three separate tables. Looking at a combination of the `hash` and the insertion timestamp in each table should help map the lifecycle of an event from pending to all (active) to closed. For example, the insertion timestamp of the `closed` table - the insertion timestamp of the `all` table should give the length of an event.
+
+- **Pending Events**: The primary key of the pending events table is `{insertion_date}_{hash}`. If an event is inserted near midnight (EST) and remains pending until the next day, a duplicate record will be added. Check the insertion timestamp to ensure there are no back to back records with the same `hash` and consecutive insertion dates.
+
+- **Dynamo/S3**: It can be expensive/slow (without some [finagling](./dynamodb.md)) to download the entire database directly off of DynamoDB when it gets larger (in about a year). This is why the daily S3 dumps are available. See the [Export All Data](#export-all-data) section for more details.
 
 ## Quickstart
 
