@@ -34,6 +34,7 @@ provider:
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
       Resource:
+        - { "Fn::GetAtt": ["PendingEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["AllEventsTable", "Arn"] }
         - { "Fn::GetAtt": ["ClosedEventsTable", "Arn"] }
     -  Effect: "Allow"
@@ -108,9 +109,8 @@ resources:
 
     PendingEventsTable:
       Type: 'AWS::DynamoDB::Table'
-      # DeletionPolicy: Retain
       Properties:
-        TableName: ${self:service}-closed-${opt:stage, self:provider.stage}
+        TableName: ${self:service}-pending-${opt:stage, self:provider.stage}
         AttributeDefinitions:
           - AttributeName: inserted_date
             AttributeType: S
@@ -127,7 +127,6 @@ resources:
 
     AllEventsTable:
       Type: 'AWS::DynamoDB::Table'
-      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:service}-all-${opt:stage, self:provider.stage}
         AttributeDefinitions:
@@ -146,7 +145,6 @@ resources:
 
     ClosedEventsTable:
       Type: 'AWS::DynamoDB::Table'
-      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:service}-closed-${opt:stage, self:provider.stage}
         AttributeDefinitions:
@@ -165,7 +163,6 @@ resources:
 
     EventsBucket:
       Type: AWS::S3::Bucket
-      # DeletionPolicy: Retain
       Properties:
         BucketName: ${self:service}-${opt:stage, self:provider.stage}
         AccessControl: PublicRead
