@@ -158,6 +158,10 @@ def archive(event, context):
         if len(items) == 0:
             print("no items found in dynamo table")
             continue
+
+        if 'pending' in prefix:
+            items.sort(key=lambda x: x['inserted_timestamp'])
+
         key = f"{prefix}{date}.json"
         with io.StringIO() as f:
             for item in items:
