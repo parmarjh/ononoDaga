@@ -1,5 +1,7 @@
 # onondaga-e911
 
+Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
+
 ## Data
 
 **UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
@@ -17,8 +19,6 @@ aws s3 ls s3://onondaga-e911-dev/all/
 aws s3 ls s3://onondaga-e911-dev/closed/
 aws s3 ls s3://onondaga-e911-dev/pending/
 ```
-
-Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
 
 ## Caveats
 
