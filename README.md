@@ -4,8 +4,8 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 ## Data
 
-**Dev UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
-**Prod UI**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
+- **Dev UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
+- **Prod UI**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
 
 **DynamoDB Tables**
 
