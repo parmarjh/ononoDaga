@@ -16,7 +16,8 @@ s3 = boto3.resource('s3')
 
 SCRAPE_PAGE = os.getenv('SCRAPE_PAGE')
 IS_LOCAL = os.getenv('IS_LOCAL')
-INIT_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
+MAIN_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
+MAX_PAGES = 5
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -26,30 +27,16 @@ hashable_keys = [
     'addr_pre', 'addr_name', 'addr_type', 'addr_suffix', 'addr_place',
     'municipality', 'cross_street1', 'cross_street2',]
 
-def scrape(event, context):
+def parse_and_save(soup):
 
-    url = os.environ['SCRAPE_URL']
-    
-    s = requests.Session()
-
-    response = s.get(INIT_URL)
-    response.raise_for_status()
-
-    if "doLink1Action" in url:
-        pass # optimization for "All" page, no need to make second request
+    print(soup.select("title")[0].text)
+    if not soup.select("#form1:tableEx1:statistics1"):
+        current_page = 1
     else:
-        # make second request after establishing cookies
-        response = s.get(url)
-        response.raise_for_status()
-
-    if "There are currently no active events for this agency" in response.text:
-        print("No events found.")
-        return []
-
-    soup = BeautifulSoup(response.content, 'html.parser')
-    
+        current_page = soup.select("#form1:tableEx1:statistics1 span")[0].text.split(' ')[1]
+    print("current_page", current_page)
     last_update = soup.select("#cdate")[0].text
-    print(last_update)
+    print("last_update", last_update)
 
     for i, row_el in enumerate(soup.select('.dataTableEx > tbody > tr')):
 
@@ -108,6 +95,40 @@ def scrape(event, context):
                 print(f"skipping {row['id']}, already saved in {table.table_name}")
             else:
                 raise
+
+def scrape(event, context):
+
+    url = os.environ['SCRAPE_URL']
+
+    s = requests.Session()
+
+    response = s.get(MAIN_URL)
+    response.raise_for_status()
+
+    if "doLink1Action" in url:
+        pass # optimization for "All" page, no need to make second request
+    else:
+        # make second request to switch to correct page after establishing cookies
+        response = s.get(url)
+        response.raise_for_status()
+
+    if "There are currently no active events for this agency" in response.text:
+        print("No events found.")
+        return []
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+    if not soup.select("#form1:tableEx1:statistics1"):
+        num_pages = 1
+    else:
+        num_pages = int(soup.select("#form1:tableEx1:statistics1 span")[0].text.split(' ')[-1])
+    print("num_pages", num_pages)
+    parse_and_save(soup)
+
+    for page in range(1, min(MAX_PAGES, num_pages)): # they internally use zero indexed page numbers
+        response = s.post(MAIN_URL, data={"form1": "form1", "form1:tableEx1:web1__pagerWeb": page})
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        parse_and_save(soup)
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):

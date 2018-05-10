@@ -6,8 +6,8 @@ name = "pypi"
 [packages]
 requests = "*"
 "boto3" = "*"
-"bs4" = "*"
 arrow = "*"
+"beautifulsoup4" = "*"
 
 [dev-packages]
 
