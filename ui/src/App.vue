@@ -1,22 +1,23 @@
 <template>
   <div id="app">
     <h1>Onodanga County E911</h1>
-    <select v-model="type">
-      <option>pending</option>
-      <option>all</option>
-      <option>closed</option>
-    </select>
-    <input v-model="date"></input>
-    <button v-on:click="fetchData">Fetch</button>
-    <br/><br/>
-    <div style='width:100%; margin:0px auto; display:inline-block;'>
-    <button v-on:click="prevDay" style="float: left;">←</button>
-    <button v-on:click="nextDay" style="float: right;">→</button>
+
+    <div class='controls' style='width:100%; margin:0px auto; display:inline-block; text-align: center;'>
+      <select v-model="type">
+        <option>pending</option>
+        <option>all</option>
+        <option>closed</option>
+      </select>
+      <input v-model="date"></input>
+      <button v-on:click="fetchData">Fetch</button>
+
+      <button v-on:click="prevDay" style="float: left;">←</button>
+      <button v-on:click="nextDay" style="float: right;">→</button>
     <br/><br/>
     </div>
     <table>
       <thead>
-        <th>#</th>
+        <th style="width: 20px;">#</th>
         <th>Hash</th>
         <th>Inserted</th>
         <th>Agency</th>
@@ -33,7 +34,7 @@
         <td :title="row.hash">{{ row.hash.slice(0,10) }}</td>
         <td style="white-space:nowrap;">{{ format(row.inserted_timestamp, 'h:mm A') }}</td>
         <td>{{ row.agency }}</td>
-        <td style="white-space:nowrap;">{{ format(row.timestamp, 'h:mm A') }}</td>
+        <td style="white-space:nowrap;">{{ row.timestamp ? format(row.timestamp, 'h:mm A') : '' }}</td>
         <td>{{ row.category }}</td>
         <td>{{ row.category_details }}</td>
         <td>{{[row.addr_pre,
@@ -102,12 +103,11 @@ export default {
 
 body {
   margin: 0 auto;
-  max-width: 85%;
-  font-size: 12px;
+  font-size: 10px;
 }
 
-input, select, button, table {
-  font-size: 1.2em;
+table {
+  font-size: 1em;
 }
 
 /*h1 {
@@ -119,13 +119,17 @@ input, select, button, table {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 0 auto;
+  max-width: 85%;
 }
 
-h1, h2 {
+h1 {
   font-weight: normal;
   font-size: 3em;
+}
+
+.controls *, th {
+  font-size: 1.2em;
 }
 
 ul {
@@ -147,6 +151,7 @@ table {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 50px;
+  width: 100%;
 }
 
 table, th, td {
