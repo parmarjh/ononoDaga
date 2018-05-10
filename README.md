@@ -4,21 +4,20 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 ## Data
 
-**UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
+**Dev UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
+**Prod UI**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
 
 **DynamoDB Tables**
 
-- `onondaga-e911-all-dev`
-- `onondaga-e911-closed-dev`
-- `onondaga-e911-all-dev`
+- `onondaga-e911-all-(dev|prod)`
+- `onondaga-e911-closed-(dev|prod)`
+- `onondaga-e911-all-(dev|prod)`
 
-**Data Dumps**:
+**S3 Folders**:
 
-```
-aws s3 ls s3://onondaga-e911-dev/all/
-aws s3 ls s3://onondaga-e911-dev/closed/
-aws s3 ls s3://onondaga-e911-dev/pending/
-```
+- `s3://onondaga-e911-(dev|prod)/all/`
+- `s3://onondaga-e911-(dev|prod)/closed/`
+- `s3://onondaga-e911-(dev|prod)/pending/`
 
 ## Caveats
 
@@ -109,6 +108,10 @@ serverless logs --function scrape_all --tail
 ```
 pipenv shell # activate python virtualenv
 serverless invoke local --function scrape_all
+serverless invoke local --function scrape_closed
+serverless invoke local --function archive_all
+serverless invoke local --function archive_closed
+serverless invoke local --function archive_pending
 ```
 
 ## Deleting everything
@@ -116,20 +119,18 @@ serverless invoke local --function scrape_all
 For `dev` stage:
 
 ```
-aws s3 rm --recursive s3://onondaga-e911-dev
+aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bucket
 serverless remove
 ```
 
-## Export Data
-
-The names of tables are `onondaga-e911-(all|closed)-(dev|prod)`. For example `onondaga-e911-all-dev`.
+## Export
 
 ### Export Single Date
 
-This command exports data from "2018-04-24".
+This command exports data from "2018-05-09".
 
 ```
-aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-04-24"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
+aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-05-09"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
 ```
 
 ### Export All Data
