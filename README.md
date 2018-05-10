@@ -132,7 +132,25 @@ aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression
 
 ### Export All Data
 
-Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database. Check [dynamo.md](./dynamo.md) for more details.
+## S3
+
+For large data dumps, use S3. The latest three (today, yesterday, day before) files are updated hourly.
+
+This command will download the entire bucket:
+
+```
+aws s3 sync s3://onondaga-e911-dev .
+```
+
+This command will just download the `all` folder:
+
+```
+aws s3 sync s3://onondaga-e911-dev/all .
+```
+
+## DynamoDB
+
+Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database directly from DynamoDB. Check [dynamo.md](./dynamo.md) for more details.
 
 ```
 dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
