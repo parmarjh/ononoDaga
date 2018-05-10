@@ -76,6 +76,15 @@ functions:
     events:
       - schedule: rate(1 minute)
 
+  archive_pending:
+    handler: scraper.archive
+    environment:
+      DYNAMODB_TABLE: ${self:resources.Resources.PendingEventsTable.Properties.TableName}
+      S3_BUCKET: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+      S3_PREFIX: pending/
+    events:
+      - schedule: rate(1 hour)
+
   archive_all:
     handler: scraper.archive
     environment:

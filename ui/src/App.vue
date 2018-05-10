@@ -2,6 +2,7 @@
   <div id="app">
     <h1>Onodanga County E911</h1>
     <select v-model="type">
+      <option>pending</option>
       <option>all</option>
       <option>closed</option>
     </select>

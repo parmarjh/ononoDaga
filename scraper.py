@@ -121,11 +121,16 @@ class DecimalEncoder(json.JSONEncoder):
 def archive(event, context):
     bucket = s3.Bucket(os.environ['S3_BUCKET'])
     prefix = os.environ['S3_PREFIX']
+
+    query_key = 'date'
+    if 'pending' in prefix:
+        query_key = 'inserted_date'
+
     for days_ago in range(0,2+1): # today, yesterday, two days ago
         date = arrow.utcnow().to('US/Eastern').shift(days=-days_ago).date().isoformat()
         print(f"archiving data for {date}")
         table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-        response = table.query(KeyConditionExpression=Key('date').eq(date))
+        response = table.query(KeyConditionExpression=Key(query_key).eq(date))
         items = response['Items']
         if len(items) == 0:
             print("no items found in dynamo table")
