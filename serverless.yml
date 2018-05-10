@@ -4,6 +4,22 @@ frameworkVersion: ">=1.2.0 <2.0.0"
 
 plugins:
   - serverless-python-requirements
+  - serverless-s3-deploy
+
+custom:
+  assets:
+    targets:
+     - bucket: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+       files:
+        - source: ./ui/
+          empty: false
+          globs: 'index.html'
+     - bucket: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+       files:
+        - source: ./ui/dist/
+          empty: false
+          globs: '**/*.*'
+          prefix: dist
 
 package:
   exclude:

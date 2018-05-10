@@ -89,7 +89,9 @@ aws s3 ls s3://onondaga-e911-dev/pending/
 
 	```
 	pipenv shell
-	serverless deploy
+	serverless deploy -v
+	npm run --prefix ui build
+	serverless s3deploy -v
 	```
 
 	To deploy to production add `--stage prod` to the deploy command.
