@@ -25,11 +25,21 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	- The primary key (unique identifier) for the `all` and `closed` tables is `{timestamp}_{hash}`. The timestamp for the `pending` table is `{insertion_date}_{hash}`.
 	- Keep in mind that the exact same row data (consisting of agency, address, cross streets etc.) can and very likely will happen multiple times so the `hash` by itself is not globally unique. The `timestamp` is not included as part of the `hash` because there is no fixed timestamp for pending events.
 
-- **Immutable Data**: We assume that the data in the tables are an immutable stream which means that the data in each row is unchanging, and rows are just streaming in and out as events change status (active->closed). Our job is just catching the rows from the table before they disappear. If any data in a row changes (is not immutable), it will be recorded as a new row because the row's `hash` will change. We observed one such case for an item pending dispatch:
+- **Immutable Data**: We assume that each row of data is immutable meaning that once it appears on the website it does not change (no change in category, address, etc.). If any data in a row changes, it will be recorded as a new row because the row's `hash` will change. Unfortunately, I don't know how much this assumption actually holds:
+
+	Here is one such case for an item pending dispatch:
 
 	![](https://i.imgur.com/kHWYCkh.png)
-
-	It's likely that the data is immutable once the dispatch is sent, but we don't know for sure.
+	
+	Here is another case captured in the all (active) page:
+	
+	![](https://i.imgur.com/yjHTXki.png)
+	
+	You'll see that the item inserted at 1:08 AM (with hash `6c45a830b5`) is the "actual" item. It has a corresponding row in the "closed" page with the same hash. The other hash (`719a02a814`) is no where to be found:
+	
+	![](https://i.imgur.com/FBuBlNo.png)
+	
+	Thus, data changes- it will be difficult to figure out with 100% certainity when this happens. Fortunately, one good clue is that it seems the timestamp remains the same when data changes in the all (active) state.
 
 - **Linking Data**: Data for pending/all/closed events is stored in three separate tables. Looking at a combination of the `hash`, `timestamp`, and the `insertion_timestamp` in each table should help map the lifecycle of an event from pending to all (active) to closed. For example, `(the insertion timestamp of the closed table) - (the insertion timestamp of the `all` table)` should give the length of an event.
 
