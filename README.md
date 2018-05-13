@@ -27,15 +27,15 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 - **Immutable Data**: We assume that each row of data is immutable meaning that once it appears on the website it does not change (no change in category, address, etc.). If any data in a row changes, it will be recorded as a new row because the row's `hash` will change. Unfortunately, I don't know how much this assumption actually holds:
 
-	Here is one such case for an item pending dispatch:
+	Here is one such case for an item pending dispatch ([May 10 - Pending](https://s3.amazonaws.com/onondaga-e911-dev/index.html?type=pending&date=2018-05-10)):
 
 	![](https://i.imgur.com/kHWYCkh.png)
-	
-	Here is another case captured in the all (active) page:
+
+	Here is another case captured in the all (active) page ([May 11 - All](https://s3.amazonaws.com/onondaga-e911-dev/index.html?type=all&date=2018-05-11)):
 	
 	![](https://i.imgur.com/yjHTXki.png)
 	
-	You'll see that the item inserted at 1:08 AM (with hash `6c45a830b5`) is the "actual" item. It has a corresponding row in the "closed" page with the same hash. The other hash (`719a02a814`) is no where to be found:
+	You'll see that the item inserted at 1:08 AM (with hash `6c45a830b5`) is the "actual" item. It has a corresponding row in the "closed" page with the same hash. The other hash (`719a02a814`) is no where to be found ([May 11 - Closed](https://s3.amazonaws.com/onondaga-e911-dev/index.html?type=closed&date=2018-05-11)):
 	
 	![](https://i.imgur.com/FBuBlNo.png)
 	
