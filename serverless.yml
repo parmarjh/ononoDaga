@@ -15,11 +15,11 @@ custom:
           empty: false
           globs: 'index.html'
      - bucket: ${self:resources.Resources.EventsBucket.Properties.BucketName}
+       prefix: dist
        files:
         - source: ./ui/dist/
           empty: false
           globs: '**/*.*'
-          prefix: dist
 
 package:
   exclude:
