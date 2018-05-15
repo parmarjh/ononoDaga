@@ -72,7 +72,6 @@ export default {
 
       this.$router.replace({
         name: 'home',
-        path: '*',
         query: { type: this.type, date: this.date }});
 
       try {

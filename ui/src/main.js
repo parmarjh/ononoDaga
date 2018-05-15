@@ -9,10 +9,9 @@ import format from 'date-fns/format';
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     routes: [{
         name: 'home',
-        // Wildcard path
         path: '*',
         // Specify the component to be rendered for this route
         component: Home,
