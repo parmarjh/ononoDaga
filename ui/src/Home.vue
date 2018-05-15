@@ -70,6 +70,11 @@ export default {
       this.currentType = this.type;
       this.currentDate = this.date;
 
+      this.$router.replace({
+        name: 'home',
+        path: '*',
+        query: { type: this.type, date: this.date }});
+
       try {
         const rows = await fetchNdjson(`https://s3.amazonaws.com/onondaga-e911-dev/${this.currentType}/${this.currentDate}.json`);
         this.rows = rows;

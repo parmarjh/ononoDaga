@@ -10,10 +10,8 @@ Vue.use(VueRouter)
 
 const router = new VueRouter({
     mode: 'history',
-    /*
-    We just add one route
-     */
     routes: [{
+        name: 'home',
         // Wildcard path
         path: '*',
         // Specify the component to be rendered for this route
