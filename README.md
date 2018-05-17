@@ -100,13 +100,17 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 4. Deploy the stack with serverless.
 
-	`pipenv shell` will activate a virtualenv and load your environment variables. `serverless deploy` will create the stack on AWS.
+	```
+	pipenv run serverless deploy -v
+	```
+
+	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
+
+	Alternatively, the command `pipenv shell` loads your environment variables in a subshell after which you can just run `serverless deploy`:
 
 	```
 	pipenv shell
 	serverless deploy -v
-	npm run --prefix ui build
-	serverless s3deploy -v
 	```
 
 	To deploy to production add `--stage prod` to the deploy command.
@@ -137,6 +141,13 @@ For `dev` stage:
 ```
 aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bucket
 serverless remove
+```
+
+## Deploy just UI
+
+```
+npm run --prefix ui build
+serverless s3deploy -v
 ```
 
 ## Export

@@ -8,6 +8,7 @@ plugins:
 
 custom:
   assets:
+    auto: true
     targets:
      - bucket: ${self:resources.Resources.EventsBucket.Properties.BucketName}
        files:
