@@ -49,7 +49,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
 
-	To deploy to production add `--stage prod` to the deploy command.
+	When you're ready to deploy to production add, `--stage prod` to the end of the deploy command.
 
 ## Data
 
@@ -101,7 +101,6 @@ This is a bit more complicated because of the cost structure for DynamoDB. See [
 ### Check Logs
 
 ```
-pipenv shell
 serverless logs --function scrape_all --tail
 serverless logs --function scrape_closed --tail
 serverless logs --function archive_all --tail
@@ -112,7 +111,6 @@ serverless logs --function archive_pending --tail
 ### Running locally
 
 ```
-pipenv shell # activate python virtualenv
 serverless invoke local --function scrape_all
 serverless invoke local --function scrape_closed
 serverless invoke local --function archive_all
@@ -122,16 +120,13 @@ serverless invoke local --function archive_pending
 
 ### Undeploy All
 
+🚨 This will delete the data (dynamo tables and s3 bucket)! 🚨
+
 For `dev` stage:
 
 ```
 aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bucket
-serverless remove
+serverless remove -v
 ```
 
-### Deploy just UI
-
-```
-npm run --prefix ui build
-serverless s3deploy -v
-```
+For `prod` stage: don't do it!
