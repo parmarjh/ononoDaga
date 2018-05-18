@@ -31,7 +31,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 		For additional help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
-		⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. This is out of scope for this README. ⚠️
+		⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. Please see [docs/iam.md](./docs/iam.md) for instructions on how to do this. ⚠️
 
 3. Create `.env` file.
 
@@ -96,7 +96,7 @@ aws s3 sync s3://onondaga-e911-dev .
 
 ### Download Data directly from DynamoDB
 
-This is a bit more complicated because of the cost structure for DynamoDB. See (./docs/dynamodb.md) for more details.
+This is a bit more complicated because of the cost structure for DynamoDB. See [docs/dynamodb.md](./docs/dynamodb.md) for more details.
 
 ### Check Logs
 
