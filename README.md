@@ -23,7 +23,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	- Add these credentials to the aws command line. Run this command and follow the steps:
 
 		```
-		aws configure --profile
+		aws configure
 		```
 
 		- If you don't know what region to choose, set it to `us-east-1`.
