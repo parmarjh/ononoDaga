@@ -39,7 +39,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	touch .env
 	```
 
-	If you are using the `default` aws profile, just leave the file blank. Otherwise, set: `AWS_PROFILE=xyz` where `xyz` is the name of your profile.
+	If you are using the `default` aws profile, just leave the file blank. Otherwise, open the file and write `AWS_PROFILE=xyz` (where `xyz` is the name of your profile) into the first line of the file and save.
 
 4. Deploy the stack with serverless.
 
