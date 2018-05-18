@@ -11,4 +11,4 @@
     - AmazonS3FullAccess
     - CloudWatchFullAccess
 
-4. 
+4. Run `aws configure` and use the programmatic access keys you recieved above.
