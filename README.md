@@ -29,9 +29,9 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 		- If you don't know what region to choose, set it to `us-east-1`.
 		- If you already have a separate AWS account setup append ` --profile <profile>` to `aws configure`.
 
-	For additional help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+		For additional help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
-	⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. This is out of scope for this README. ⚠️
+		⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. This is out of scope for this README. ⚠️
 
 3. Create `.env` file.
 
