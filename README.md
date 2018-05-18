@@ -2,22 +2,61 @@
 
 Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
 
-## Data
+![](https://i.imgur.com/Ht2tH4u.png)
 
-- **Dev UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
-- **Prod UI**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
+## Quickstart
 
-**DynamoDB Tables**
+1. Install dependencies.
+	
+	```
+	brew install jq python node
+	pip3 install awscli pipenv
+	npm install -g serverless
+	pipenv install
+	npm install
+	```
 
-- `onondaga-e911-all-(dev|prod)`
-- `onondaga-e911-closed-(dev|prod)`
-- `onondaga-e911-pending-(dev|prod)`
+2. Set up AWS.
 
-**S3 Folders**:
+	- Create an AWS account: https://portal.aws.amazon.com/billing/signup
+	- Get the root credentials for your account and keep them in a safe place: https://console.aws.amazon.com/iam/home?#security_credential
+	- Add these credentials to the aws command line. Run this command and follow the steps:
 
-- `s3://onondaga-e911-(dev|prod)/all/`
-- `s3://onondaga-e911-(dev|prod)/closed/`
-- `s3://onondaga-e911-(dev|prod)/pending/`
+		```
+		aws configure --profile
+		```
+
+		- If you don't know what region to choose, set it to `us-east-1`.
+		- If you already have a separate AWS account setup append ` --profile <profile>` to `aws configure`.
+
+	For additional help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+
+	⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. This is out of scope for this README. ⚠️
+
+3. Create `.env` file.
+
+	```
+	touch .env
+	```
+
+	If you are using the `default` aws profile, just leave the file blank. Otherwise, set: `AWS_PROFILE=xyz` where `xyz` is the name of your profile.
+
+4. Deploy the stack with serverless.
+
+	```
+	pipenv run serverless deploy -v
+	```
+
+	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
+
+	Alternatively, the command `pipenv shell` loads your environment variables in a subshell after which you can just run `serverless deploy`:
+
+	```
+	pipenv shell
+	serverless deploy -v
+	```
+
+	To deploy to production add `--stage prod` to the deploy command: `pipenv run serverless deploy -v --stage prod`
 
 ## Caveats
 
@@ -47,83 +86,63 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 - **Dynamo/S3**: It can be expensive/slow (without some [finagling](./dynamodb.md)) to download the entire database directly off of DynamoDB when it gets larger (in about a year). This is why the daily S3 dumps are available. See the [Export All Data](#export-all-data) section for more details.
 
-## Quickstart
+## Data
 
-1. Install dependencies.
+- **Dev UI**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
+- **Prod UI**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
 
-	Must have node and python3.6 installed.
+**DynamoDB Tables**
 
-	```
-	brew install jq
-	pip3 install awscli
-	pip3 install pipenv
-	pipenv install
-	npm install -g serverless
-	npm install -g @mapbox/dyno
-	npm install
-	```
+- `onondaga-e911-all-(dev|prod)`
+- `onondaga-e911-closed-(dev|prod)`
+- `onondaga-e911-pending-(dev|prod)`
 
-2. Set up AWS Credentials.
+**S3 Folders**:
 
-	You have two options for AWS Credentials: root user (easy, less secure) or creating IAM roles (slightly more work, more secure).
+- `s3://onondaga-e911-(dev|prod)/all/`
+- `s3://onondaga-e911-(dev|prod)/closed/`
+- `s3://onondaga-e911-(dev|prod)/pending/`
 
-	To get the root AWS credentials of your account, go here: https://console.aws.amazon.com/iam/home?#security_credential
+## Usage
 
-	To instead create a specific IAM user, go here: https://console.aws.amazon.com/iam/home?#/users You will need to allow the user to create lambdas, dynamodb tables, and log groups.
+Start `pipenv shell` before starting to run any commands. This will set the environment variables properly.
 
-	Once you have the aws access key id and aws secret access key, this command below will help you set up the `default` profile for AWS:
+### Download Data from S3
 
-	```
-	aws configure
-	```
-
-	Run `cat ~/.aws/credentials` to ensure the credentials are set up properly. Make sure you have the `region` set.
-
-	The output should look similar to:
-
-	```
-	[default]
-	aws_access_key_id = xxx
-	aws_secret_access_key = xxx
-	region = us-east-1
-	```
-
-	For help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
-
-3. Create `.env` file.
-
-	```
-	touch .env
-	```
-
-	If you are using the `default` aws role, just leave the file blank. Otherwise, set: `AWS_PROFILE=xyz` where `xyz` is the name of your profile.
-
-4. Deploy the stack with serverless.
-
-	```
-	pipenv run serverless deploy -v
-	```
-
-	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
-
-	Alternatively, the command `pipenv shell` loads your environment variables in a subshell after which you can just run `serverless deploy`:
-
-	```
-	pipenv shell
-	serverless deploy -v
-	```
-
-	To deploy to production add `--stage prod` to the deploy command.
-
-## Checking Logs
-
-Function names are `scrape_all` or `scrape_closed`.
+#### Download Single Date
 
 ```
+aws s3 cp s3://onondaga-e911-dev/all/2018-05-17.json .
+```
+
+#### Download all data for "closed" page
+
+```
+aws s3 sync s3://onondaga-e911-dev/closed .
+```
+
+#### Download everything
+
+```
+aws s3 sync s3://onondaga-e911-dev .
+```
+
+### Download Data directly from DynamoDB
+
+This is a bit more complicated because of the cost structure for DynamoDB. See (./docs/dynamodb.md) for more details.
+
+### Check Logs
+
+```
+pipenv shell
 serverless logs --function scrape_all --tail
+serverless logs --function scrape_closed --tail
+serverless logs --function archive_all --tail
+serverless logs --function archive_closed --tail
+serverless logs --function archive_pending --tail
 ```
 
-## Running locally
+### Running locally
 
 ```
 pipenv shell # activate python virtualenv
@@ -134,7 +153,7 @@ serverless invoke local --function archive_closed
 serverless invoke local --function archive_pending
 ```
 
-## Deleting everything
+### Undeploy All
 
 For `dev` stage:
 
@@ -143,53 +162,9 @@ aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bu
 serverless remove
 ```
 
-## Deploy just UI
+### Deploy just UI
 
 ```
 npm run --prefix ui build
 serverless s3deploy -v
-```
-
-## Export
-
-### Export Single Date
-
-This command exports data from "2018-05-09".
-
-```
-aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-05-09"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
-```
-
-### Export All Data
-
-## S3
-
-For large data dumps, use S3. The latest three (today, yesterday, day before) files are updated hourly.
-
-This command will download the entire bucket:
-
-```
-aws s3 sync s3://onondaga-e911-dev .
-```
-
-This command will just download the `all` folder:
-
-```
-aws s3 sync s3://onondaga-e911-dev/all .
-```
-
-## DynamoDB
-
-Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database directly from DynamoDB. Check [dynamo.md](./dynamo.md) for more details.
-
-```
-dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
-dyno scan us-east-1/onondaga-e911-closed-dev | jq -f filter.jq
-```
-
-You can pipe this into a file to save the data. This pipes the output into `onondaga-e911-all-dev.json` and `onondaga-e911-closed-dev.json` respectively.
-
-```
-dyno scan us-east-1/onondaga-e911-all-dev | jq -Mcf filter.jq > onondaga-e911-all-dev.json
-dyno scan us-east-1/onondaga-e911-closed-dev | jq -Mcf filter.jq > onondaga-e911-closed-dev.json
 ```

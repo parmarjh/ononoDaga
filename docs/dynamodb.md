@@ -1,5 +1,17 @@
 # DynamoDB
 
+## Export Single Date from DynamoDB
+
+This command exports data from "2018-05-17".
+
+```
+aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-05-17"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
+```
+
+## Explore All from DynamoDB
+
+Please note that the database is provisioned with 1 read capacity unit (RCU). You may want to increase this if you are exporting the entire database directly from DynamoDB.
+
 ## Read Capacity Units (RCUs)
 
 ### Overview
@@ -39,9 +51,26 @@ Check:
 },
 ```
 
-
 ### Change Read Capacity Units
 
 ```
 aws dynamodb update-table --table-name onondaga-e911-all-dev --provisioned-throughput ReadCapacityUnits=10
+```
+
+### Download All the Data
+
+Once you've adjusted your Read Capacity Units (so the command doesn't run forever)...
+
+Run this to install `dyno`: `npm install -g @mapbox/dyno`
+
+```
+dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
+dyno scan us-east-1/onondaga-e911-closed-dev | jq -f filter.jq
+```
+
+You can pipe this into a file to save the data. This pipes the output into `onondaga-e911-all-dev.json` and `onondaga-e911-closed-dev.json` respectively.
+
+```
+dyno scan us-east-1/onondaga-e911-all-dev | jq -Mcf filter.jq > onondaga-e911-all-dev.json
+dyno scan us-east-1/onondaga-e911-closed-dev | jq -Mcf filter.jq > onondaga-e911-closed-dev.json
 ```
