@@ -49,14 +49,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
 
-	Alternatively, the command `pipenv shell` loads your environment variables in a subshell after which you can just run `serverless deploy`:
-
-	```
-	pipenv shell
-	serverless deploy -v
-	```
-
-	To deploy to production add `--stage prod` to the deploy command: `pipenv run serverless deploy -v --stage prod`
+	To deploy to production add `--stage prod` to the deploy command.
 
 ## Caveats
 
@@ -105,7 +98,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 ## Usage
 
-Start `pipenv shell` before starting to run any commands. This will set the environment variables properly.
+🚨 Start `pipenv shell` before starting to run ANY of the commands below. This will start a python virtualenv and set the environment variables (`.env`) properly. 🚨
 
 ### Download Data from S3
 
