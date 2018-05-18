@@ -6,7 +6,24 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 ## Quickstart
 
-1. Install dependencies.
+1. Clone repository.
+
+	- change directory (cd) to your projects or development folder
+
+		```
+		cd ~/Development
+		```
+
+	- clone the repository and cd into the repository folder
+
+		```
+		git clone git@github.com:AlJohri/onondaga-e911.git
+		cd onondaga-e911
+		```
+
+	- Run all commands below from the `onondaga-e911` folder.
+
+2. Install dependencies.
 	
 	```
 	brew install jq python node
@@ -16,7 +33,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	npm install
 	```
 
-2. Set up AWS.
+3. Set up AWS.
 
 	- Create an AWS account: https://portal.aws.amazon.com/billing/signup
 	- Get the root credentials for your account and keep them in a safe place: https://console.aws.amazon.com/iam/home?#security_credential
@@ -33,7 +50,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 		⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. Please see [docs/iam.md](./docs/iam.md) for instructions on how to do this. ⚠️
 
-3. Create `.env` file.
+4. Create `.env` file.
 
 	```
 	touch .env
@@ -41,7 +58,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	If you are using the `default` aws profile, just leave the file blank. Otherwise, open the file and write `AWS_PROFILE=xyz` (where `xyz` is the name of your profile) into the first line of the file and save.
 
-4. Deploy the stack with serverless.
+5. Deploy the stack with serverless.
 
 	```
 	pipenv run serverless deploy -v
