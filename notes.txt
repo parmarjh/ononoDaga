@@ -1,0 +1,113 @@
+Examples:
+- https://github.com/serverless/examples/tree/master/aws-python-scheduled-cron
+- https://github.com/serverless/examples/tree/master/aws-python-rest-api-with-dynamodb
+- https://github.com/serverless/examples/tree/master/aws-python-rest-api-with-pynamodb
+
+aws dynamodb scan --table-name mytable --query "Items[*].[id.S,name.S]" --output text
+
+https://stackoverflow.com/questions/33357821/how-to-export-a-dynamodb-table-as-a-csv-through-aws-cli-without-using-pipeline
+
+
+https://aws.amazon.com/blogs/database/automatically-archive-items-to-s3-using-dynamodb-time-to-live-with-aws-lambda-and-amazon-kinesis-firehose/
+
+https://github.com/awslabs/lambda-streams-to-firehose
+
+https://github.com/awslabs/dynamodb-continuous-backup
+
+https://github.com/boazdejong/serverless-graphql-api#dynamodb-streams
+https://forum.serverless.com/t/dynamodb-streams-creation/792/10
+
+
+JQ dynamo magic
+https://stackoverflow.com/questions/28593471/how-to-simplify-aws-dynamodb-query-json-output-from-the-command-line
+
+
+
+
+
+
+
+
+
+  #   KinesisFirehose:
+  #     Type: AWS::KinesisFirehose::DeliveryStream
+  #     Properties:
+  #       DeliveryStreamName: ${self:provider.environment.FIREHOSE_STREAM}
+  #       S3DestinationConfiguration:
+  #         BucketARN:
+  #           Fn::Join:
+  #             - ''
+  #             - - 'arn:aws:s3:::'
+  #               - Ref: KinesisFirehoseBucket
+  #         BufferingHints:
+  #           IntervalInSeconds: "60"
+  #           SizeInMBs: "1"
+  #         CompressionFormat: "UNCOMPRESSED"
+  #         Prefix: "raw/"
+  #         RoleARN: { Fn::GetAtt: [ FirehoseToS3Role, Arn ] }
+
+  # KinesisFirehoseBucket:
+  #   Type: AWS::S3::Bucket
+  #   DeletionPolicy: Retain
+  #   Properties:
+  #     BucketName: ${self:provider.environment.S3_BUCKET}
+
+  # FirehoseToS3Role:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: FirehoseToS3Role
+  #     AssumeRolePolicyDocument:
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service:
+  #           - firehose.amazonaws.com
+  #         Action:
+  #         - sts:AssumeRole
+  #     Policies:
+  #     - PolicyName: FirehoseToS3Policy
+  #       PolicyDocument:
+  #         Statement:
+  #           - Effect: Allow
+  #             Action:
+  #               - s3:AbortMultipartUpload
+  #               - s3:GetBucketLocation
+  #               - s3:GetObject
+  #               - s3:ListBucket
+  #               - s3:ListBucketMultipartUploads
+  #               - s3:PutObject
+  #             Resource: '*'
+
+
+------------------------------------------------------------
+
+http://notes.webutvikling.org/aws-send-ec2-logs-to-slack/
+
+----------------------------------------------------
+
+https://github.com/funkybob/serverless-s3-deploy
+https://github.com/fernando-mc/serverless-finch
+https://github.com/SC5/serverless-plugin-additional-stacks
+
+
+# aws
+
+some commands to help delete stuff when serverless messes up
+
+```
+aws events list-rules
+```
+
+```
+aws dynamodb list-tables
+aws dynamodb list-tables | jq -r '.TableNames[]' | xargs -tL 1 aws dynamodb delete-table --table-name
+```
+
+```
+aws cloudformation list-stacks | jq -r '.StackSummaries[].StackId' | xargs -tL 1 aws cloudformation delete-stack --stack-name
+```
+
+```
+aws s3 rm --recursive s3://onondaga-e911-dev
+aws s3api delete-bucket --bucket onondaga-e911-dev
+```
