@@ -48,7 +48,7 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 		For additional help, see: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
-		⚠️ It's not best practice to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. Please see [docs/iam.md](./docs/iam.md) for instructions on how to do this. ⚠️
+		⚠️ It's not [best practice](https://docs.aws.amazon.com/general/latest/gr/root-vs-iam.html) to directly use the root credentials. You ideally want to create an IAM user with just the permissions it needs. Please see [docs/iam.md](./docs/iam.md) for instructions on how to do this. ⚠️
 
 4. Create `.env` file.
 
