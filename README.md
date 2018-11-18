@@ -24,11 +24,9 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 	- Run all commands below from the `onondaga-e911` folder.
 
 2. Install dependencies.
-	
+
 	```
-	brew install jq python node
-	pip3 install awscli pipenv
-	npm install -g serverless
+	brew install jq python node awscli pipenv
 	pipenv install
 	npm install
 	```
@@ -61,10 +59,10 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 5. Deploy the stack with serverless.
 
 	```
-	pipenv run serverless deploy -v
+	pipenv run npx serverless deploy -v
 	```
 
-	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `serverless deploy`.
+	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `npx serverless deploy`.
 
 	When you're ready to deploy to production add, `--stage prod` to the end of the deploy command.
 
@@ -122,21 +120,21 @@ This is a bit more complicated because of the cost structure for DynamoDB. See [
 ### Check Logs
 
 ```
-serverless logs --function scrape_all --tail
-serverless logs --function scrape_closed --tail
-serverless logs --function archive_all --tail
-serverless logs --function archive_closed --tail
-serverless logs --function archive_pending --tail
+npx serverless logs --function scrape_all --tail
+npx serverless logs --function scrape_closed --tail
+npx serverless logs --function archive_all --tail
+npx serverless logs --function archive_closed --tail
+npx serverless logs --function archive_pending --tail
 ```
 
 ### Running locally
 
 ```
-serverless invoke local --function scrape_all
-serverless invoke local --function scrape_closed
-serverless invoke local --function archive_all
-serverless invoke local --function archive_closed
-serverless invoke local --function archive_pending
+npx serverless invoke local --function scrape_all
+npx serverless invoke local --function scrape_closed
+npx serverless invoke local --function archive_all
+npx serverless invoke local --function archive_closed
+npx serverless invoke local --function archive_pending
 ```
 
 ### Undeploy All
