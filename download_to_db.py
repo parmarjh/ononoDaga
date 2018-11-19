@@ -8,7 +8,7 @@ import concurrent.futures
 import urllib.request
 
 def make_url(page, date):
-    return f"https://s3.amazonaws.com/onondaga-e911-dev/{page}/{date}.json"
+    return "https://s3.amazonaws.com/onondaga-e911-dev/%s/%s.json" % (page, date)
 
 def get_date_range(start, end):
     delta = end - start
@@ -54,25 +54,25 @@ def setup_tables():
         inserted_date TEXT
     """.strip()
 
-    sql = f"""
+    sql = """
     CREATE TABLE IF NOT EXISTS all_page (
-        {columns},
+        %s,
         date TEXT,
         timestamp TEXT
     )
-    """
+    """ % columns
     cur.execute(sql)
 
-    sql = f"""
+    sql = """
     CREATE TABLE IF NOT EXISTS closed_page (
-        {columns},
+        %s,
         date TEXT,
         timestamp TEXT
     )
-    """
+    """ % columns
     cur.execute(sql)
 
-    sql = f"CREATE TABLE IF NOT EXISTS pending_page ({columns})"
+    sql = "CREATE TABLE IF NOT EXISTS pending_page (%s)" % columns
     cur.execute(sql)
 
 def insert_row(row, table, verbose=False):
@@ -91,7 +91,7 @@ def insert_row(row, table, verbose=False):
     
     values = ('?,' * len(columns)).rstrip(',')
 
-    sql = f"INSERT INTO {table}({','.join(columns)}) VALUES({values})"
+    sql = "INSERT INTO {table}(%s) VALUES()" % (','.join(columns), values)
     cur = conn.cursor()
     try:
         cur.execute(sql, [row[c] for c in columns])
