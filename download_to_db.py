@@ -88,10 +88,10 @@ def insert_row(row, table, verbose=False):
 
     if table in ['all_page', 'closed_page']:
         columns += ['date', 'timestamp']
-    
+
     values = ('?,' * len(columns)).rstrip(',')
 
-    sql = "INSERT INTO {table}(%s) VALUES()" % (','.join(columns), values)
+    sql = "INSERT INTO %s(%s) VALUES(%s)" % (table, ','.join(columns), values)
     cur = conn.cursor()
     try:
         cur.execute(sql, [row[c] for c in columns])
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     urls = [make_url(args.page, date) for date in get_date_range(start, end)]
     rows = download(urls)
     print('finished downloading %s rows from %s dates' % (len(rows), len(urls)))
-    
+
     conn = sqlite3.connect(args.db)
     cur = conn.cursor()
     setup_tables()
