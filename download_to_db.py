@@ -97,10 +97,10 @@ def insert_row(row, table, verbose=False):
         cur.execute(sql, [row[c] for c in columns])
     except sqlite3.IntegrityError:
         conn.rollback()
-        if verbose: print(f'already exists {row["id"]}')
+        if verbose: print('already exists', row["id"])
     else:
         conn.commit()
-        if verbose: print(f'inserted {row["id"]}')
+        if verbose: print('inserted', row["id"])
 
 if __name__ == "__main__":
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     end = datetime.datetime.strptime(args.end, r'%Y-%m-%d').date()
     urls = [make_url(args.page, date) for date in get_date_range(start, end)]
     rows = download(urls)
-    print(f'finished downloading {len(rows)} rows from {len(urls)} dates')
+    print('finished downloading %s rows from %s dates' % (len(rows), len(urls)))
     
     conn = sqlite3.connect(args.db)
     cur = conn.cursor()
@@ -129,4 +129,4 @@ if __name__ == "__main__":
     table = args.page + "_page"
     for row in rows:
         insert_row(row, table, args.verbose)
-    print(f'finished inserting {len(rows)} rows into table {table} of db {args.db}')
+    print('finished inserting %s rows into table %s of db %s' % (len(rows), table, args.db))
