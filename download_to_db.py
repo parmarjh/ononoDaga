@@ -12,11 +12,12 @@ def make_url(page, date):
 
 def get_date_range(start, end):
     delta = end - start
-    yield from (start + datetime.timedelta(i) for i in range(delta.days + 1))
+    for i in range(delta.days + 1):
+        yield start + datetime.timedelta(i)
 
 def load_url(url, timeout):
     with urllib.request.urlopen(url, timeout=timeout) as conn:
-        return conn.read()
+        return conn.read().decode('utf-8')
 
 def download(urls):
     rows = []
