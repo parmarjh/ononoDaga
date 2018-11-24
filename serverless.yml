@@ -5,6 +5,7 @@ frameworkVersion: ">=1.2.0 <2.0.0"
 plugins:
   - serverless-python-requirements
   - serverless-s3-deploy
+  - serverless-pseudo-parameters
 
 custom:
   assets:
