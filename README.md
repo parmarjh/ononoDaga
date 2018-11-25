@@ -145,7 +145,7 @@ For `dev` stage:
 
 ```
 aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bucket
-serverless remove -v
+npx serverless remove -v
 ```
 
 For `prod` stage: don't do it!
