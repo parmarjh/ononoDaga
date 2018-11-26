@@ -139,18 +139,3 @@ npx serverless invoke local --function archive_pending
 ```
 pipenv run npx serverless s3deploy -v
 ```
-
-<!--
-
-Leaving this commented out to prevent anyone from ever running this.
-
-### Undeploy All
-
-🚨 This will delete the data (dynamo tables and s3 bucket)! 🚨
-
-```
-aws s3 rm --recursive s3://onondaga-e911-prod # need to delete contents of bucket before deleting the bucket itself
-npx serverless remove -v
-```
-
--->
