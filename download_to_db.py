@@ -27,7 +27,7 @@ def load_url(url, timeout):
     with urllib.request.urlopen(url, timeout=timeout) as conn:
         return conn.read().decode('utf-8')
 
-def download(urls):
+def download(urls, verbose=False):
     rows = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         future_to_url = {executor.submit(load_url, url, 60): url for url in urls}
@@ -38,7 +38,7 @@ def download(urls):
             except Exception as exc:
                 print('%s generated an exception: %s' % (url, exc))
             else:
-                print('%s downloaded' % url)
+                if verbose: print('%s downloaded' % url)
                 rows += [json.loads(line) for line in data.splitlines()]
     return rows
 
@@ -97,8 +97,12 @@ def insert_rows(conn, rows, table, verbose=False):
     if verbose:
         print('inserting', row["id"])
 
+    columns_str = ','.join(columns)
     question_marks = ('?,' * len(columns)).rstrip(',')
-    sql = f"INSERT OR IGNORE INTO {table}({','.join(columns)}) VALUES({question_marks})"
+    sql = "INSERT OR IGNORE INTO {table}({columns_str}) VALUES({question_marks})".format(
+        table=table,
+        columns_str=columns_str,
+        question_marks=question_marks)
     conn.executemany(sql, [[row[c] for c in columns] for row in rows])
     conn.commit()
 
@@ -121,6 +125,7 @@ if __name__ == "__main__":
     start = datetime.datetime.strptime(args.start, r'%Y-%m-%d').date()
     end = datetime.datetime.strptime(args.end, r'%Y-%m-%d').date()
     urls = [make_url(args.page, date) for date in get_date_range(start, end)]
+    print('downloading data between %s and %s (%s days)' % (start, end, len(urls)))
     rows = download(urls)
     print('finished downloading %s rows from %s dates' % (len(rows), len(urls)))
 
