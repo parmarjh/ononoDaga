@@ -8,7 +8,7 @@ import concurrent.futures
 import urllib.request
 
 def make_url(page, date):
-    return "https://s3.amazonaws.com/onondaga-e911-dev/%s/%s.json" % (page, date)
+    return "https://s3.amazonaws.com/onondaga-e911-prod/%s/%s.json" % (page, date)
 
 def get_date_range(start, end):
     delta = end - start

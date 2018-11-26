@@ -64,8 +64,6 @@ Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn
 
 	Prefixing with `pipenv run` loads the environment variables that we just set in the `.env` file and then runs the command `npx serverless deploy`.
 
-	When you're ready to deploy to production add, `--stage prod` to the end of the deploy command.
-
 ## Data
 
 I recommend reading the [caveats](./docs/caveats.md) in detail before using this data.
@@ -74,20 +72,19 @@ I recommend reading the [caveats](./docs/caveats.md) in detail before using this
 
 _Chrome Only_
 
-- **Dev**: https://s3.amazonaws.com/onondaga-e911-dev/index.html
-- **Prod**: https://s3.amazonaws.com/onondaga-e911-prod/index.html
+https://s3.amazonaws.com/onondaga-e911-prod/index.html
 
 **DynamoDB Tables**
 
-- `onondaga-e911-all-(dev|prod)`
-- `onondaga-e911-closed-(dev|prod)`
-- `onondaga-e911-pending-(dev|prod)`
+- `onondaga-e911-all-prod`
+- `onondaga-e911-closed-prod`
+- `onondaga-e911-pending-prod`
 
 **S3 Folders**:
 
-- `s3://onondaga-e911-(dev|prod)/all/`
-- `s3://onondaga-e911-(dev|prod)/closed/`
-- `s3://onondaga-e911-(dev|prod)/pending/`
+- `s3://onondaga-e911-prod/all/`
+- `s3://onondaga-e911-prod/closed/`
+- `s3://onondaga-e911-prod/pending/`
 
 ## Usage
 
@@ -98,19 +95,19 @@ _Chrome Only_
 #### Download Single Date
 
 ```
-aws s3 cp s3://onondaga-e911-dev/all/2018-05-17.json .
+aws s3 cp s3://onondaga-e911-prod/all/2018-05-17.json .
 ```
 
 #### Download all data for "closed" page
 
 ```
-aws s3 sync s3://onondaga-e911-dev/closed .
+aws s3 sync s3://onondaga-e911-prod/closed .
 ```
 
 #### Download everything
 
 ```
-aws s3 sync s3://onondaga-e911-dev .
+aws s3 sync s3://onondaga-e911-prod .
 ```
 
 ### Download Data directly from DynamoDB
@@ -137,15 +134,23 @@ npx serverless invoke local --function archive_closed
 npx serverless invoke local --function archive_pending
 ```
 
+## Deploying UI
+
+```
+pipenv run npx serverless s3deploy -v
+```
+
+<!--
+
+Leaving this commented out to prevent anyone from ever running this.
+
 ### Undeploy All
 
 🚨 This will delete the data (dynamo tables and s3 bucket)! 🚨
 
-For `dev` stage:
-
 ```
-aws s3 rm --recursive s3://onondaga-e911-dev # need to delete contents before bucket
+aws s3 rm --recursive s3://onondaga-e911-prod # need to delete contents of bucket before deleting the bucket itself
 npx serverless remove -v
 ```
 
-For `prod` stage: don't do it!
+-->

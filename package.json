@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
+    "@mapbox/dyno": "^1.4.1",
     "serverless": "^1.33.2",
     "serverless-pseudo-parameters": "^2.2.0",
-    "serverless-python-requirements": "^4.0.2",
-    "serverless-s3-deploy": "^0.6.1"
+    "serverless-python-requirements": "^4.2.5",
+    "serverless-s3-deploy": "^0.7.0"
   }
 }

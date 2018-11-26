@@ -36,6 +36,7 @@ package:
 provider:
   name: aws
   runtime: python3.6
+  stage: prod
   region: us-east-1
   iamRoleStatements:
     - Effect: Allow

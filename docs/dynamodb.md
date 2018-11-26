@@ -5,7 +5,7 @@
 This command exports data from "2018-05-17".
 
 ```
-aws dynamodb query --table-name onondaga-e911-all-dev --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-05-17"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
+aws dynamodb query --table-name onondaga-e911-all-prod --key-condition-expression "#d = :date" --expression-attribute-values '{":date": {"S":"2018-05-17"}}' --expression-attribute-names '{"#d":"date"}' --return-consumed-capacity TOTAL | jq -f filter.jq
 ```
 
 ## Explore All from DynamoDB
@@ -38,7 +38,7 @@ For help, see:
 ### Check Read/Write Capacity Units
 
 ```
-aws dynamodb describe-table --table-name onondaga-e911-all-dev
+aws dynamodb describe-table --table-name onondaga-e911-all-prod
 ```
 
 Check:
@@ -54,23 +54,21 @@ Check:
 ### Change Read Capacity Units
 
 ```
-aws dynamodb update-table --table-name onondaga-e911-all-dev --provisioned-throughput ReadCapacityUnits=10
+aws dynamodb update-table --table-name onondaga-e911-all-prod --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=1
 ```
 
 ### Download All the Data
 
 Once you've adjusted your Read Capacity Units (so the command doesn't run forever)...
 
-Run this to install `dyno`: `npm install -g @mapbox/dyno`
-
 ```
-dyno scan us-east-1/onondaga-e911-all-dev | jq -f filter.jq
-dyno scan us-east-1/onondaga-e911-closed-dev | jq -f filter.jq
+npx dyno scan us-east-1/onondaga-e911-all-prod | jq -f filter.jq
+npx dyno scan us-east-1/onondaga-e911-closed-prod | jq -f filter.jq
 ```
 
-You can pipe this into a file to save the data. This pipes the output into `onondaga-e911-all-dev.json` and `onondaga-e911-closed-dev.json` respectively.
+You can pipe this into a file to save the data. This pipes the output into `onondaga-e911-all-prod.json` and `onondaga-e911-closed-prod.json` respectively.
 
 ```
-dyno scan us-east-1/onondaga-e911-all-dev | jq -Mcf filter.jq > onondaga-e911-all-dev.json
-dyno scan us-east-1/onondaga-e911-closed-dev | jq -Mcf filter.jq > onondaga-e911-closed-dev.json
+npx dyno scan us-east-1/onondaga-e911-all-prod | jq -Mcf filter.jq > onondaga-e911-all-prod.json
+npx dyno scan us-east-1/onondaga-e911-closed-prod | jq -Mcf filter.jq > onondaga-e911-closed-prod.json
 ```

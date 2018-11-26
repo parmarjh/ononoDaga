@@ -22,13 +22,15 @@
             "Effect": "Allow",
             "Action": [
                 "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
                 "cloudformation:DescribeStacks",
                 "cloudformation:DescribeStackEvents",
                 "cloudformation:DescribeStackResource",
                 "cloudformation:GetTemplate",
                 "cloudformation:ValidateTemplate",
                 "cloudformation:UpdateStack",
-                "cloudformation:ListStacks"
+                "cloudformation:ListStacks",
+                "cloudformation:ListStackResources"
             ],
             "Resource": "*"
         }

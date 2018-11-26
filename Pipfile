@@ -11,6 +11,7 @@ arrow = "*"
 
 [dev-packages]
 pylint = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.6"

@@ -6,18 +6,18 @@
 
 - **Immutable Data**: We assume that each row of data is immutable meaning that once it appears on the website it does not change (no change in category, address, etc.). If any data in a row changes, it will be recorded as a new row because the row's `hash` will change. Unfortunately, I don't know how much this assumption actually holds:
 
-	Here is one such case for an item pending dispatch ([May 10 - Pending](https://s3.amazonaws.com/onondaga-e911-dev/index.html#/?type=pending&date=2018-05-10)):
+	Here is one such case for an item pending dispatch ([May 10 - Pending](https://s3.amazonaws.com/onondaga-e911-prod/index.html#/?type=pending&date=2018-05-10)):
 
 	![](https://i.imgur.com/kHWYCkh.png)
 
-	Here is another case captured in the all (active) page ([May 11 - All](https://s3.amazonaws.com/onondaga-e911-dev/index.html#/?type=all&date=2018-05-11)):
-	
+	Here is another case captured in the all (active) page ([May 11 - All](https://s3.amazonaws.com/onondaga-e911-prod/index.html#/?type=all&date=2018-05-11)):
+
 	![](https://i.imgur.com/yjHTXki.png)
-	
-	You'll see that the item inserted at 1:08 AM (with hash `6c45a830b5`) is the "actual" item. It has a corresponding row in the "closed" page with the same hash. The other hash (`719a02a814`) is no where to be found ([May 11 - Closed](https://s3.amazonaws.com/onondaga-e911-dev/index.html#/?type=closed&date=2018-05-11)):
-	
+
+	You'll see that the item inserted at 1:08 AM (with hash `6c45a830b5`) is the "actual" item. It has a corresponding row in the "closed" page with the same hash. The other hash (`719a02a814`) is no where to be found ([May 11 - Closed](https://s3.amazonaws.com/onondaga-e911-prod/index.html#/?type=closed&date=2018-05-11)):
+
 	![](https://i.imgur.com/FBuBlNo.png)
-	
+
 	Thus, data changes- it will be difficult to figure out with 100% certainity when this happens. Fortunately, one good clue is that it seems the timestamp remains the same when data changes in the all (active) state.
 
 - **Linking Data**: Data for pending/all/closed events is stored in three separate tables. Looking at a combination of the `hash`, `timestamp`, and the `insertion_timestamp` in each table should help map the lifecycle of an event from pending to all (active) to closed. For example, `(the insertion timestamp of the closed table) - (the insertion timestamp of the `all` table)` should give the length of an event.

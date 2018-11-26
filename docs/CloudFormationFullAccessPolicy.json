@@ -1,6 +1,0 @@
-{
-    "PolicyName": "CloudFormationFullAccess",
-    "Path": "/",
-    "PolicyDocument": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Action\": [\"cloudformation:CreateStack\", \"cloudformation:DescribeStacks\", \"cloudformation:DescribeStackEvents\", \"cloudformation:DescribeStackResource\", \"cloudformation:GetTemplate\", \"cloudformation:ValidateTemplate\", \"cloudformation:UpdateStack\", \"cloudformation:ListStacks\"], \"Resource\": \"*\"}]}",
-    "Description": "CloudFormationFullAccess"
-}

@@ -75,7 +75,7 @@ export default {
         query: { type: this.type, date: this.date }});
 
       try {
-        const rows = await fetchNdjson(`https://s3.amazonaws.com/onondaga-e911-dev/${this.currentType}/${this.currentDate}.json`);
+        const rows = await fetchNdjson(`https://s3.amazonaws.com/onondaga-e911-prod/${this.currentType}/${this.currentDate}.json`);
         this.rows = rows;
       } catch(err) {
         this.noData  = true;
