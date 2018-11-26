@@ -3,9 +3,17 @@
 import json
 import argparse
 import datetime
+import itertools
 import sqlite3
 import concurrent.futures
 import urllib.request
+
+def grouper(iterable, n):
+    # https://docs.python.org/3.7/library/itertools.html#itertools-recipes
+    "Collect data into fixed-length chunks or blocks"
+    args = [iter(iterable)] * n
+    for batch in itertools.zip_longest(*args, fillvalue=None):
+        yield filter(None.__ne__, batch)
 
 def make_url(page, date):
     return "https://s3.amazonaws.com/onondaga-e911-prod/%s/%s.json" % (page, date)
@@ -34,9 +42,7 @@ def download(urls):
                 rows += [json.loads(line) for line in data.splitlines()]
     return rows
 
-def setup_tables():
-
-    global conn, cur
+def setup_tables(conn):
 
     columns = """
         id TEXT PRIMARY KEY,
@@ -62,7 +68,7 @@ def setup_tables():
         timestamp TEXT
     )
     """ % columns
-    cur.execute(sql)
+    conn.execute(sql)
 
     sql = """
     CREATE TABLE IF NOT EXISTS closed_page (
@@ -71,14 +77,12 @@ def setup_tables():
         timestamp TEXT
     )
     """ % columns
-    cur.execute(sql)
+    conn.execute(sql)
 
     sql = "CREATE TABLE IF NOT EXISTS pending_page (%s)" % columns
-    cur.execute(sql)
+    conn.execute(sql)
 
-def insert_row(row, table, verbose=False):
-
-    global conn, cur
+def insert_rows(conn, rows, table, verbose=False):
 
     columns = [
         'id', 'agency', 'category', 'category_details',
@@ -90,18 +94,13 @@ def insert_row(row, table, verbose=False):
     if table in ['all_page', 'closed_page']:
         columns += ['date', 'timestamp']
 
-    values = ('?,' * len(columns)).rstrip(',')
+    if verbose:
+        print('inserting', row["id"])
 
-    sql = "INSERT INTO %s(%s) VALUES(%s)" % (table, ','.join(columns), values)
-    cur = conn.cursor()
-    try:
-        cur.execute(sql, [row[c] for c in columns])
-    except sqlite3.IntegrityError:
-        conn.rollback()
-        if verbose: print('already exists', row["id"])
-    else:
-        conn.commit()
-        if verbose: print('inserted', row["id"])
+    question_marks = ('?,' * len(columns)).rstrip(',')
+    sql = f"INSERT OR IGNORE INTO {table}({','.join(columns)}) VALUES({question_marks})"
+    conn.executemany(sql, [[row[c] for c in columns] for row in rows])
+    conn.commit()
 
 if __name__ == "__main__":
 
@@ -116,6 +115,7 @@ if __name__ == "__main__":
         default='onondaga.db',
         help='Database where data will be downloaded into.')
     parser.add_argument('--verbose', action='store_true', default=False)
+    parser.add_argument('--batch-size', type=int, default=2000)
     args = parser.parse_args()
 
     start = datetime.datetime.strptime(args.start, r'%Y-%m-%d').date()
@@ -125,9 +125,10 @@ if __name__ == "__main__":
     print('finished downloading %s rows from %s dates' % (len(rows), len(urls)))
 
     conn = sqlite3.connect(args.db)
-    cur = conn.cursor()
-    setup_tables()
+    if args.verbose:
+        conn.set_trace_callback(print)
+    setup_tables(conn)
     table = args.page + "_page"
-    for row in rows:
-        insert_row(row, table, args.verbose)
+    for batch in grouper(rows, args.batch_size):
+        insert_rows(conn, batch, table, args.verbose)
     print('finished inserting %s rows into table %s of db %s' % (len(rows), table, args.db))
