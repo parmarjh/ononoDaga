@@ -118,8 +118,10 @@ if __name__ == "__main__":
     parser.add_argument('--db',
         default='onondaga.db',
         help='Database where data will be downloaded into.')
-    parser.add_argument('--verbose', action='store_true', default=False)
-    parser.add_argument('--batch-size', type=int, default=2000)
+    parser.add_argument('--verbose', action='store_true', default=False,
+        help='')
+    parser.add_argument('--batch-size', type=int, default=2000,
+        help='Number of rows inserted into sqlite database at a time.')
     args = parser.parse_args()
 
     start = datetime.datetime.strptime(args.start, r'%Y-%m-%d').date()
