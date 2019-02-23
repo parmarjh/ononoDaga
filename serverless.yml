@@ -35,7 +35,7 @@ package:
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.7
   stage: prod
   region: us-east-1
   iamRoleStatements:
@@ -77,7 +77,7 @@ functions:
     handler: scraper.scrape
     environment:
       SCRAPE_PAGE: "all"
-      SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink1Action&_rvip=/events.jsp"
+      SCRAPE_URL: "https://911events.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink1Action&_rvip=/events.jsp"
       PENDING_EVENTS_TABLE: ${self:resources.Resources.PendingEventsTable.Properties.TableName}
       ALL_EVENTS_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
       CLOSED_EVENTS_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}
@@ -88,7 +88,7 @@ functions:
     handler: scraper.scrape
     environment:
       SCRAPE_PAGE: "closed"
-      SCRAPE_URL: "http://wowbn.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink7Action&_rvip=/events.jsp"
+      SCRAPE_URL: "https://911events.ongov.net/CADInet/app/_rlvid.jsp?_rap=pc_Cad911Toweb.doLink7Action&_rvip=/events.jsp"
       PENDING_EVENTS_TABLE: ${self:resources.Resources.PendingEventsTable.Properties.TableName}
       ALL_EVENTS_TABLE: ${self:resources.Resources.AllEventsTable.Properties.TableName}
       CLOSED_EVENTS_TABLE: ${self:resources.Resources.ClosedEventsTable.Properties.TableName}

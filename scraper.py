@@ -16,7 +16,7 @@ s3 = boto3.resource('s3')
 
 SCRAPE_PAGE = os.getenv('SCRAPE_PAGE')
 IS_LOCAL = os.getenv('IS_LOCAL')
-MAIN_URL = "http://wowbn.ongov.net/CADInet/app/events.jsp"
+MAIN_URL = "https://911events.ongov.net/CADInet/app/events.jsp"
 MAX_PAGES = 5
 
 logger = logging.getLogger(__name__)
@@ -30,10 +30,10 @@ hashable_keys = [
 def parse_and_save(soup):
 
     print(soup.select("title")[0].text)
-    if not soup.select("#form1:tableEx1:statistics1"):
+    if not soup.select(r"#form1\:tableEx1\:statistics1"):
         current_page = 1
     else:
-        current_page = soup.select("#form1:tableEx1:statistics1 span")[0].text.split(' ')[1]
+        current_page = soup.select(r"#form1\:tableEx1\:statistics1 span")[0].text.split(' ')[1]
     print("current_page", current_page)
     last_update = soup.select("#cdate")[0].text
     print("last_update", last_update)
@@ -119,15 +119,15 @@ def scrape(event, context):
         return []
 
     soup = BeautifulSoup(response.content, 'html.parser')
-    if not soup.select("#form1:tableEx1:statistics1"):
+    if not soup.select(r"#form1\:tableEx1\:statistics1"):
         num_pages = 1
     else:
-        num_pages = int(soup.select("#form1:tableEx1:statistics1 span")[0].text.split(' ')[-1])
+        num_pages = int(soup.select(r"#form1\:tableEx1\:statistics1 span")[0].text.split(' ')[-1])
     print("num_pages", num_pages)
     parse_and_save(soup)
 
     for page in range(1, min(MAX_PAGES, num_pages)): # they internally use zero indexed page numbers
-        response = s.post(MAIN_URL, data={"form1": "form1", "form1:tableEx1:web1__pagerWeb": page})
+        response = s.post(MAIN_URL, data={"form1": "form1", r"form1\:tableEx1\:web1__pagerWeb": page})
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
         parse_and_save(soup)

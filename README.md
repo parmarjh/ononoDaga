@@ -1,6 +1,6 @@
 # onondaga-e911
 
-Scrape Onondaga county's computer aided dispatch (CAD) E911 events: http://wowbn.ongov.net/CADInet/app/events.jsp
+Scrape Onondaga county's computer aided dispatch (CAD) E911 events: https://911events.ongov.net/CADInet/app/events.jsp
 
 ![](https://i.imgur.com/Ht2tH4u.png)
 
